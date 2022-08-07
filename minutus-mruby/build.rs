@@ -1,7 +1,6 @@
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use std::env;
 use std::path::Path;
-use std::process::Command;
 
 fn main() -> Result<()> {
     println!("cargo:rerun-if-changed=bridge");
@@ -9,32 +8,54 @@ fn main() -> Result<()> {
 
     let out_dir = env::var("OUT_DIR").unwrap();
 
-    setup_mruby(&out_dir, &mruby_version()).unwrap();
+    download_mruby(&out_dir, &mruby_version()).unwrap();
     compile_bridge(&out_dir)?;
 
     if do_link() {
+        build_mruby(&out_dir);
         println!("cargo:rustc-link-lib=mruby");
         println!("cargo:rustc-link-search={}/mruby/build/host/lib", out_dir);
     }
 
+    println!("Finish build.rs");
+
     Ok(())
 }
 
-fn setup_mruby(out_dir: &str, version: &str) -> std::io::Result<()> {
-    Command::new("git")
-        .current_dir(out_dir)
-        .args(["clone", "--depth=1", "https://github.com/mruby/mruby.git"])
-        .output()?;
+fn run_command(current_dir: &str, cmd: &[&str]) -> Result<()> {
+    println!("Start: {:?}", cmd);
 
-    let mruby_dir = Path::new(out_dir).join("mruby");
-    Command::new("git")
-        .current_dir(mruby_dir.clone())
-        .args(["checkout", version])
-        .output()?;
-    Command::new("rake")
-        .current_dir(mruby_dir)
-        .output()
-        .expect("failed to build mruby");
+    let status = std::process::Command::new(cmd[0])
+        .args(&cmd[1..])
+        .current_dir(current_dir)
+        .status()?;
+    if status.success() {
+        Ok(())
+    } else {
+        Err(anyhow!(format!("Executing {:?} failed", cmd)))
+    }
+}
+
+fn build_mruby(out_dir: &str) {
+    run_command(
+        Path::new(out_dir).join("mruby").to_str().unwrap(),
+        &["rake"],
+    )
+    .unwrap();
+}
+
+fn download_mruby(out_dir: &str, version: &str) -> Result<()> {
+    let url = if version == "master" {
+        String::from("https://github.com/mruby/mruby/archive/refs/heads/master.tar.gz")
+    } else {
+        format!(
+            "https://github.com/mruby/mruby/archive/refs/tags/{}.tar.gz",
+            version
+        )
+    };
+    run_command(out_dir, &["wget", &url, "-O", "mruby.tar.gz"])?;
+    run_command(out_dir, &["tar", "zxf", "mruby.tar.gz"])?;
+    run_command(out_dir, &["mv", &format!("mruby-{}", version), "mruby"])?;
 
     Ok(())
 }
@@ -62,10 +83,7 @@ fn compile_bridge(out_dir: &str) -> Result<()> {
     let mruby_include_path = Path::new(out_dir).join("mruby/include");
     let out_path = Path::new(out_dir).join("mruby.rs");
 
-    Command::new("ruby")
-        .current_dir("bridge")
-        .args(["all.rb"])
-        .output()?;
+    run_command("bridge", &["ruby", "all.rb"])?;
 
     let allowlist_types = &[
         "minu_.*",
@@ -86,6 +104,10 @@ fn compile_bridge(out_dir: &str) -> Result<()> {
     ];
     let allowlist_functions = &["minu_.*", "mrb_raise", "mrb_get_args"];
 
+    println!("Start generating binding");
+
+    println!("include path: {}", mruby_include_path.to_str().unwrap());
+
     let bindings = bindgen::Builder::default()
         .clang_arg(format!("-I{}", mruby_include_path.to_str().unwrap()))
         .header("src/bridge.c")
@@ -97,10 +119,16 @@ fn compile_bridge(out_dir: &str) -> Result<()> {
         .generate()?;
     bindings.write_to_file(out_path)?;
 
+    println!("Finish generating binding");
+
+    println!("Start compiling binding");
+
     cc::Build::new()
         .file("src/bridge.c")
         .include(mruby_include_path)
         .compile("minutus_bridge");
+
+    println!("Finish compiling binding");
 
     Ok(())
 }
