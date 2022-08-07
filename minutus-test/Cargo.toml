@@ -1,0 +1,9 @@
+[package]
+name = "minutus-test"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+minutus = { path = "../minutus", features = ["mruby_3_1_0", "link_mruby"] }

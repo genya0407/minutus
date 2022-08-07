@@ -1,0 +1,16 @@
+[package]
+name = "minutus"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+minutus-macros = { path = "../minutus-macros" }
+minutus-macros-type = { path = "../minutus-macros-type" }
+minutus-mruby = { path = "../minutus-mruby" }
+
+[features]
+default = ["mruby_3_1_0"]
+mruby_3_1_0 = ["minutus-mruby/mruby_3_1_0"]
+mruby_2_1_2 = ["minutus-mruby/mruby_2_1_2"]
+mruby_master = ["minutus-mruby/mruby_master"]
+link_mruby = ["minutus-mruby/link_mruby"]

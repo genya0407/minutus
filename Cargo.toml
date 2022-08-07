@@ -1,0 +1,10 @@
+[workspace]
+
+members = [
+    "minutus",
+    "minutus-macros",
+    "minutus-macros-type",
+    "minutus-mruby",
+    "minutus-test",
+]
+
