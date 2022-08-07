@@ -1,0 +1,7 @@
+name: mruby-polars
+description: Polars class
+author: Yusuke Sangenya
+website: https://github.com/genya0407/mruby-polars
+protocol: git
+repository: https://github.com/genya0407/mruby-polars.git
+license: MIT
