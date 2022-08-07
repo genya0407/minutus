@@ -2,16 +2,6 @@
 ## Polars Test
 ##
 
-assert("Polars#hello") do
-  t = Polars.new "hello"
-  assert_equal("hello", t.hello)
-end
-
-assert("Polars#bye") do
-  t = Polars.new "hello"
-  assert_equal("hello bye", t.bye)
-end
-
-assert("Polars.hi") do
-  assert_equal("hi!!", Polars.hi)
+assert("Point#distance") do
+  assert_equal(1.41421356, Point.new(1,1).distance(Point.new(2,2)).round(8))
 end
