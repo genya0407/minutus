@@ -14,7 +14,7 @@ end
 
 desc "compile binary"
 task :compile => :mruby do
-  sh "cd mruby && rake all MRUBY_CONFIG=#{MRUBY_CONFIG}"
+  sh "cd mruby && rake clean all MRUBY_CONFIG=#{MRUBY_CONFIG}"
 end
 
 desc "test"
