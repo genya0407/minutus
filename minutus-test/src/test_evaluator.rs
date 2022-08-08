@@ -26,8 +26,7 @@ impl Point {
 #[test]
 fn test() {
     use minutus::types::*;
-    let executor =
-        minutus::Evaluator::new_with_intializer(Point::define_class_on_mrb, Point::from_mrb);
+    let executor = minutus::Evaluator::build(Point::define_class_on_mrb, Point::from_mrb);
     let point = executor.evaluate("Point.new(1,2, 'dummy')").unwrap();
     assert_eq!(*point, Point::new(1, 2, String::from("dummy")))
 }
@@ -35,8 +34,7 @@ fn test() {
 #[test]
 fn stress() {
     use minutus::types::*;
-    let executor =
-        minutus::Evaluator::new_with_intializer(Point::define_class_on_mrb, Point::from_mrb);
+    let executor = minutus::Evaluator::build(Point::define_class_on_mrb, Point::from_mrb);
     let point = executor.evaluate("Point.new(1,2, 'dummy')").unwrap();
     for _ in 0..1000 {
         executor

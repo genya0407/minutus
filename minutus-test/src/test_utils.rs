@@ -7,7 +7,7 @@ pub struct Executor {
 
 impl Executor {
     pub fn execute(&self, script: &str) {
-        let evaluator = minutus::Evaluator::new_with_intializer(self.initializer, <()>::from_mrb);
+        let evaluator = minutus::Evaluator::build(self.initializer, <()>::from_mrb);
 
         evaluator
             .evaluate(

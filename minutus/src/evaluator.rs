@@ -1,4 +1,5 @@
 use crate::mruby::*;
+use crate::types::*;
 
 pub struct Evaluator<EvaluationResult> {
     mrb: *mut minu_state,
@@ -12,20 +13,11 @@ impl<EvaluationResult> Drop for Evaluator<EvaluationResult> {
 }
 
 impl<EvaluationResult> Evaluator<EvaluationResult> {
-    pub fn new(from_mrb: fn(*mut minu_state, &minu_value) -> EvaluationResult) -> Self {
-        unsafe {
-            Self {
-                mrb: minu_open(),
-                from_mrb,
-            }
-        }
+    pub fn build_simple() -> Evaluator<()> {
+        Evaluator::<()>::build(|_| {}, <()>::from_mrb)
     }
 
-    pub fn mrb(&self) -> *mut minu_state {
-        self.mrb
-    }
-
-    pub fn new_with_intializer(
+    pub fn build(
         initializer: fn(*mut minu_state),
         from_mrb: fn(*mut minu_state, &minu_value) -> EvaluationResult,
     ) -> Self {
@@ -34,6 +26,10 @@ impl<EvaluationResult> Evaluator<EvaluationResult> {
             initializer(mrb);
             Self { mrb, from_mrb }
         }
+    }
+
+    pub fn mrb(&self) -> *mut minu_state {
+        self.mrb
     }
 
     pub fn evaluate(&self, script: &str) -> Result<EvaluationResult, String> {
