@@ -1,0 +1,30 @@
+# https://github.com/motemen/slack-stream-json/blob/97d3745dcc8931a1d75217573d5ca60705be632f/.github/workflows/release.yml
+
+name: Test
+
+on: [push, pull_request]
+jobs:
+  build:
+    strategy:
+      matrix:
+        mruby_version:
+          - "3_1_0"
+          - "2_1_2"
+        os:
+          - "ubuntu-latest"
+          - "macos-lastst"
+          # - "windows-latest"
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v1
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - run: cargo test -vv --features mruby_${{ matrix.mruby_version }}

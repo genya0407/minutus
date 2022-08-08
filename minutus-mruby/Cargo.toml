@@ -9,6 +9,10 @@ edition = "2021"
 bindgen = "*"
 cc = "*"
 anyhow = "1.0"
+bytes = "*"
+tar = "*"
+reqwest = { version = "*", features = ["blocking"] }
+flate2 = "*"
 
 [dependencies]
 [features]
