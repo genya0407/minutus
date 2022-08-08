@@ -133,7 +133,7 @@ pub trait AbstractMethodGenerator {
                 use ::minutus::types::*;
 
                 #(
-                    let mut #mrb_argument_name = ::minutus::mruby::minu_value { w: 0 };
+                    let mut #mrb_argument_name: ::minutus::mruby::minu_value = std::mem::zeroed();
                 )*
                 ::minutus::mruby::minu_get_args(
                     mrb,

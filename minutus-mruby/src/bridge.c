@@ -16,8 +16,6 @@ typedef mrb_value minu_value;
 
 typedef mrb_int minu_int;
 
-typedef mrb_uint minu_uint;
-
 typedef mrb_float minu_float;
 
 typedef mrb_bool minu_bool;
@@ -148,6 +146,15 @@ void minu_gc_register(mrb_state *mrb, mrb_value obj) {
 void minu_gc_unregister(mrb_state *mrb, mrb_value obj) {
   return mrb_gc_unregister(mrb, obj);
 }
+void minu_print_backtrace(mrb_state *mrb) { return mrb_print_backtrace(mrb); }
+
+void minu_print_error(mrb_state *mrb) { return mrb_print_error(mrb); }
+
+minu_value minu_get_backtrace(mrb_state *mrb) { return mrb_get_backtrace(mrb); }
+
+minu_value minu_exc_backtrace(mrb_state *mrb, mrb_value exc) {
+  return mrb_exc_backtrace(mrb, exc);
+}
 struct RClass *minu_class_get(minu_state *mrb, const char *name) {
   return mrb_class_get(mrb, name);
 }
@@ -168,5 +175,3 @@ void minu_close(minu_state *mrb) { return mrb_close(mrb); }
 minu_value minu_inspect(minu_state *mrb, mrb_value v) {
   return mrb_inspect(mrb, v);
 }
-void minu_print_backtrace(mrb_state *mrb) { return mrb_print_backtrace(mrb); }
-void minu_print_error(mrb_state *mrb) { return mrb_print_error(mrb); }

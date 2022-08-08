@@ -17,10 +17,4 @@ minu_state *minu_open() { return mrb_open(); }
 void minu_close(minu_state *mrb) { return mrb_close(mrb); }
 
 minu_value minu_inspect(minu_state *mrb, mrb_value v) { return mrb_inspect(mrb, v); }
-void minu_print_backtrace(mrb_state *mrb) {
-  return mrb_print_backtrace(mrb);
-}
-void minu_print_error(mrb_state *mrb) {
-  return mrb_print_error(mrb);
-}
 CODE

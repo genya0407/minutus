@@ -12,7 +12,6 @@ anyhow = "1.0"
 
 [dependencies]
 [features]
-default = ["mruby_3_1_0"]
 mruby_3_1_0 = []
 mruby_2_1_2 = []
 mruby_master = []

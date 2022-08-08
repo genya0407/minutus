@@ -54,6 +54,10 @@ fn download_mruby(out_dir: &str, version: &str) -> Result<()> {
         )
     };
     run_command(out_dir, &["wget", &url, "-O", "mruby.tar.gz"])?;
+    run_command(
+        out_dir,
+        &["rm", "-rf", &format!("mruby-{}", version), "mruby"],
+    )?;
     run_command(out_dir, &["tar", "zxf", "mruby.tar.gz"])?;
     run_command(out_dir, &["mv", &format!("mruby-{}", version), "mruby"])?;
 

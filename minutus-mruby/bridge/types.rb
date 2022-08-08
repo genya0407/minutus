@@ -5,7 +5,6 @@ types = %w[
   aspec
   value
   int
-  uint
   float
   bool
 ]

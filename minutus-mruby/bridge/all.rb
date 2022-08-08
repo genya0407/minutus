@@ -24,6 +24,7 @@ files = %w[
   array
   hash
   gc
+  exception
   other
 ]
 files.each do |name|
