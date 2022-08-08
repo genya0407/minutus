@@ -4,7 +4,6 @@ pub use minutus_macros::*;
 mod evaluator;
 mod utils;
 pub use evaluator::*;
+pub mod mruby;
 
-pub mod mruby {
-    pub use minutus_mruby::*;
-}
+pub use minutus_mruby_build_utils::MRubyBuilder;

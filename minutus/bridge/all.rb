@@ -2,7 +2,7 @@ require 'erb'
 
 OUT="#{__dir__}/../src/bridge.c"
 
-File.write(OUT, <<~HEAD)
+headers = <<~HEAD
 #include "mruby.h"
 #include "mruby/data.h"
 #include "mruby/value.h"
@@ -33,8 +33,9 @@ files = %w[
   exception
   other
 ]
-files.each do |name|
-  system("ruby #{name}.rb >> #{OUT}", exception: true)
+contents = files.map do |name|
+  `ruby #{name}.rb`
 end
-
+all = [headers, *contents].join("\n")
+File.write(OUT, all)
 system("clang-format -i #{OUT}", exception: true)

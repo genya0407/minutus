@@ -1,22 +1,13 @@
 [package]
-name = "minutus-mruby"
+name = "minutus-mruby-build-utils"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[build-dependencies]
-bindgen = "*"
-cc = "*"
+[dependencies]
 anyhow = "1.0"
 bytes = "*"
 tar = "*"
 reqwest = { version = "*", features = ["blocking"] }
 flate2 = "*"
-
-[dependencies]
-[features]
-mruby_3_1_0 = []
-mruby_2_1_2 = []
-mruby_master = []
-link_mruby = []

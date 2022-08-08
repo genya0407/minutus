@@ -73,6 +73,7 @@ minu_value minu_float_value(minu_state *minu, minu_float v) {
 }
 
 minu_value minu_obj_value(void *v) { return mrb_obj_value(v); }
+
 typedef mrb_data_type minu_data_type;
 
 void *minu_data_get_ptr(minu_state *mrb, minu_value v,
@@ -92,6 +93,7 @@ void minu_free(minu_state *mrb, void *ptr) { mrb_free(mrb, ptr); }
 void minu_set_vtype_as_data(struct RClass *cla) {
   MRB_SET_INSTANCE_TT(cla, MRB_TT_DATA);
 }
+
 void minu_define_class_method(minu_state *mrb, struct RClass *cla,
                               const char *name, mrb_func_t fun,
                               minu_aspec aspec) {
@@ -106,6 +108,7 @@ void minu_define_method(minu_state *mrb, struct RClass *cla, const char *name,
 minu_aspec minu_MRB_ARGS_ARG(uint32_t n1, uint32_t n2) {
   return MRB_ARGS_ARG(n1, n2);
 }
+
 char *minu_str_to_cstr(mrb_state *mrb, mrb_value str) {
   return mrb_str_to_cstr(mrb, str);
 }
@@ -115,6 +118,7 @@ mrb_value minu_str_new_cstr(mrb_state *mrb, const char *s) {
 mrb_value minu_str_new(mrb_state *mrb, const char *s, size_t len) {
   return mrb_str_new(mrb, s, len);
 }
+
 minu_int minu_rarray_len(minu_value ary) { return RARRAY_LEN(ary); }
 
 minu_value minu_ary_ref(minu_value ary, minu_int n) {
@@ -130,6 +134,7 @@ minu_value minu_ary_new(mrb_state *mrb) { return mrb_ary_new(mrb); }
 void minu_ary_push(mrb_state *mrb, mrb_value array, mrb_value value) {
   return mrb_ary_push(mrb, array, value);
 }
+
 minu_value minu_hash_keys(minu_state *mrb, minu_value hash) {
   return mrb_hash_keys(mrb, hash);
 }
@@ -146,12 +151,14 @@ void minu_hash_set(minu_state *mrb, minu_value hash, minu_value key,
                    minu_value val) {
   return mrb_hash_set(mrb, hash, key, val);
 }
+
 void minu_gc_register(mrb_state *mrb, mrb_value obj) {
   return mrb_gc_register(mrb, obj);
 }
 void minu_gc_unregister(mrb_state *mrb, mrb_value obj) {
   return mrb_gc_unregister(mrb, obj);
 }
+
 void minu_print_backtrace(mrb_state *mrb) { return mrb_print_backtrace(mrb); }
 
 void minu_print_error(mrb_state *mrb) { return mrb_print_error(mrb); }
@@ -161,6 +168,7 @@ minu_value minu_get_backtrace(mrb_state *mrb) { return mrb_get_backtrace(mrb); }
 minu_value minu_exc_backtrace(mrb_state *mrb, mrb_value exc) {
   return mrb_exc_backtrace(mrb, exc);
 }
+
 struct RClass *minu_class_get(minu_state *mrb, const char *name) {
   return mrb_class_get(mrb, name);
 }

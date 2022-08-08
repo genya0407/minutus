@@ -3,13 +3,19 @@ name = "minutus"
 version = "0.1.0"
 edition = "2021"
 
+[build-dependencies]
+minutus-mruby-build-utils = { path = "../minutus-mruby-build-utils" }
+anyhow = "1.0"
+bindgen = "*"
+cc = "*"
+
 [dependencies]
 minutus-macros = { path = "../minutus-macros" }
 minutus-macros-type = { path = "../minutus-macros-type" }
-minutus-mruby = { path = "../minutus-mruby" }
+minutus-mruby-build-utils = { path = "../minutus-mruby-build-utils" }
 
 [features]
-mruby_3_1_0 = ["minutus-mruby/mruby_3_1_0"]
-mruby_2_1_2 = ["minutus-mruby/mruby_2_1_2"]
-mruby_master = ["minutus-mruby/mruby_master"]
-link_mruby = ["minutus-mruby/link_mruby"]
+mruby_3_1_0 = []
+mruby_2_1_2 = []
+mruby_master = []
+link_mruby = []
