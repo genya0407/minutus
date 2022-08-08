@@ -44,9 +44,11 @@ impl<EvaluationResult> Evaluator<EvaluationResult> {
             let retval = minu_load_string(self.mrb, script_cstr.as_ptr());
 
             if !(*self.mrb).exc.is_null() {
-                let msg = minu_get_backtrace(self.mrb);
+                let inspected_exception =
+                    minu_inspect(self.mrb, minu_obj_value((*self.mrb).exc as _));
                 type OptStr = Option<String>;
-                let message = OptStr::from_mrb(self.mrb, &msg).unwrap_or(String::from(""));
+                let message =
+                    OptStr::from_mrb(self.mrb, &inspected_exception).unwrap_or(String::from(""));
                 return Err(message);
             }
 
