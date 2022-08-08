@@ -69,7 +69,8 @@ fn do_link() -> bool {
 }
 
 fn mruby_version() -> String {
-    let supported_versions = &["3.1.0", "2.1.2", "master"];
+    let default = "3.1.0";
+    let supported_versions = &["3.1.0", "2.1.2", "MASTER"];
     for version in supported_versions.into_iter() {
         if env::var(format!(
             "CARGO_FEATURE_MRUBY_{}",
@@ -77,10 +78,10 @@ fn mruby_version() -> String {
         ))
         .is_ok()
         {
-            return version.to_string();
+            return version.to_lowercase().to_string();
         }
     }
-    panic!("No mruby version is specified")
+    return default.to_string();
 }
 
 fn compile_bridge(out_dir: &str) -> Result<()> {

@@ -8,6 +8,12 @@
 #include "mruby/string.h"
 #include "mruby/value.h"
 
+// In order to use mrb_get_backtrace in mruby master
+// (a0c02e0a6465ff9f37b7b2e4801081cef7c0e93c).
+#if __has_include("mruby/internal.h")
+#include "mruby/internal.h"
+#endif
+
 typedef mrb_state minu_state;
 
 typedef mrb_aspec minu_aspec;
