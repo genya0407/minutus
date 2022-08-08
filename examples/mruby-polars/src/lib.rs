@@ -20,7 +20,7 @@ impl DataFrameBuilder {
     }
 }
 
-#[minutus::wrap(method = "to_s", class_method = "builder", method = "select")]
+#[minutus::wrap(method = "inspect", class_method = "builder", method = "select")]
 struct DF {
     df: DataFrame,
 }
@@ -32,7 +32,7 @@ impl DF {
     }
 
     #[minutus::method]
-    pub fn to_s(&self) -> String {
+    pub fn inspect(&self) -> String {
         self.df.to_string()
     }
 

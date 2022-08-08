@@ -4,7 +4,7 @@
 
 assert("DF") do
   df = DF.builder.add_integer("age", [1,2,3]).add_integer("height", [111,1222,333]).build
-  assert_equal(df.to_s,<<~RESULT.chomp)
+  assert_equal(df.inspect,<<~RESULT.chomp)
     shape: (3, 2)
     ┌─────┬────────┐
     │ age ┆ height │
@@ -19,7 +19,7 @@ assert("DF") do
     └─────┴────────┘
   RESULT
 
-  assert_equal(df.select(["height"]).to_s, <<~RESULT.chomp)
+  assert_equal(df.select(["height"]).inspect, <<~RESULT.chomp)
     shape: (3, 1)
     ┌────────┐
     │ height │
@@ -41,7 +41,7 @@ assert("DF#from") do
     "height" => [111,1222,333]
   )
 
-  assert_equal(df.to_s,<<~RESULT.chomp)
+  assert_equal(df.inspect,<<~RESULT.chomp)
     shape: (3, 2)
     ┌─────┬────────┐
     │ age ┆ height │
@@ -56,7 +56,7 @@ assert("DF#from") do
     └─────┴────────┘
   RESULT
 
-  assert_equal(df.select(["height"]).to_s, <<~RESULT.chomp)
+  assert_equal(df.select(["height"]).inspect, <<~RESULT.chomp)
     shape: (3, 1)
     ┌────────┐
     │ height │
