@@ -4,22 +4,6 @@ pub fn build_simple_evaluator() -> Evaluator<minu_value> {
     Evaluator::<minu_value>::build(|_| {}, |_mrb, value| *value)
 }
 
-// #[macro_export]
-// macro_rules! funcall_top {
-//     ($mrb:expr, $name:expr) => {{
-//         unsafe {
-//             let top = minu_obj_value((*$mrb).top_self);
-//             funcall!($mrb, top, $name)
-//         }
-//     }};
-//     ($mrb:expr, $name:expr, $($v:expr),+) => {{
-//         unsafe {
-//             let top = minu_obj_value((*$mrb).top_self as _);
-//             minutus::funcall!($mrb, top, $name, $($v),*)
-//         }
-//     }};
-// }
-
 pub struct Evaluator<EvaluationResult> {
     mrb: *mut minu_state,
     from_mrb: fn(*mut minu_state, &minu_value) -> EvaluationResult,
