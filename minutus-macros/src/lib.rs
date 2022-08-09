@@ -5,6 +5,7 @@ use quote::quote;
 use syn::parse_macro_input;
 
 mod class_deriviation_generator;
+mod funcall_generator;
 mod method_generator;
 mod name_generator;
 
@@ -59,4 +60,14 @@ pub fn method(_attr: TokenStream, input: TokenStream) -> TokenStream {
         #method_define_function
     };
     output.into()
+}
+
+#[proc_macro]
+pub fn extern_methods(input: TokenStream) -> TokenStream {
+    funcall_generator::generate_methods(input)
+}
+
+#[proc_macro]
+pub fn define_funcall(input: TokenStream) -> TokenStream {
+    funcall_generator::define_funcall(input)
 }

@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 minutus = { path = "../minutus", features = ["link_mruby"] }
+regex = "1"

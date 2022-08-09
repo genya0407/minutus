@@ -9,6 +9,7 @@ mod option;
 mod string;
 mod tuples;
 mod unit;
+mod values;
 
 pub trait IntoMrb {
     fn into_mrb(self, mrb: *mut minu_state) -> minu_value;

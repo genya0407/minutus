@@ -80,6 +80,17 @@ extern "C" {
     ) -> minu_int;
 }
 
+extern "C" {
+    #[link_name = "mrb_funcall"]
+    pub fn minu_funcall(
+        mrb: *mut minu_state,
+        val: minu_value,
+        name: *const ::std::os::raw::c_char,
+        argc: minu_int,
+        ...
+    ) -> minu_value;
+}
+
 pub unsafe fn minu_raise(
     mrb: *mut minu_state,
     c: *mut RClass,

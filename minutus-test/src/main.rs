@@ -20,6 +20,9 @@ mod test_ref_cell;
 mod test_evaluator;
 
 #[cfg(test)]
+mod test_funcall;
+
+#[cfg(test)]
 mod test_utils;
 
 fn main() {}
