@@ -7,7 +7,7 @@ NAME=mruby-example
 cd tmp
 rm -rf $NAME
 
-MRBGEM_TEMPLATE_DEBUG=true $CMD $NAME
+MRBGEM_TEMPLATE_DEBUG=true $CMD -u 'somegithubuser' -a 'Some Author' $NAME
 cd $NAME
 
 rake test

@@ -3,11 +3,12 @@ set -eux
 cargo build
 CMD=$(cargo metadata --format-version 1 | jq -r .target_directory)/debug/minutus-mrbgem-template
 
+NAME=mruby-polars
 cd tmp
-rm -rf mruby-polars
+rm -rf $NAME
 
-MRBGEM_TEMPLATE_DEBUG=true $CMD mruby-polars
-cd mruby-polars
+MRBGEM_TEMPLATE_DEBUG=true $CMD -u 'somegithubuser' -a 'Some Author' $NAME
+cd $NAME
 
 cargo add polars@0.23.1
 cat <<CODE > src/lib.rs

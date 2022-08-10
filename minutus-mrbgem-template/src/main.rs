@@ -35,7 +35,7 @@ fn main(
     license: String,
 
     /// Set user name on github
-    #[opt(short, long)]
+    #[opt(short = 'u', long)]
     github_user: Option<String>,
 
     /// Set class name
