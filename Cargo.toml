@@ -7,3 +7,7 @@ members = [
     "minutus-test",
 ]
 exclude = ["examples"]
+
+[workspace.metadata.workspaces]
+no_individual_tags = true
+allow_branch = "trunk"

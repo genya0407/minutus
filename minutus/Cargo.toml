@@ -1,18 +1,20 @@
 [package]
 name = "minutus"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
+license = "MIT"
+authors = ["Yusuke Sangenya <longinus.eva@gmail.com>"]
+description = "mruby bridge for Rust"
 
 [build-dependencies]
-minutus-mruby-build-utils = { path = "../minutus-mruby-build-utils" }
+minutus-mruby-build-utils = { version = "0.2.0", path = "../minutus-mruby-build-utils" }
 anyhow = "1.0"
-bindgen = "*"
-cc = "*"
+bindgen = "0.60.1"
+cc = "1.0.73"
 
 [dependencies]
-minutus-macros = { path = "../minutus-macros" }
-minutus-macros-type = { path = "../minutus-macros-type" }
-minutus-mruby-build-utils = { path = "../minutus-mruby-build-utils" }
+minutus-macros = { version = "0.2.0", path = "../minutus-macros" }
+minutus-mruby-build-utils = { version = "0.2.0", path = "../minutus-mruby-build-utils" }
 
 [features]
 mruby_3_1_0 = []

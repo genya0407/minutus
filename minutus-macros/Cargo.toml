@@ -1,9 +1,10 @@
 [package]
 name = "minutus-macros"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+license = "MIT"
+authors = ["Yusuke Sangenya <longinus.eva@gmail.com>"]
+description = "Procedural macro definitions for minutus"
 
 [dependencies]
 darling = "0.14.1"
