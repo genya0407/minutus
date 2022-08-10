@@ -28,3 +28,4 @@ jobs:
           toolchain: stable
           override: true
       - run: cargo test -vv --features mruby_${{ matrix.mruby_version }}
+      - run: cd minutus-mrbgem-template && ./test.sh

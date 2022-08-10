@@ -1,0 +1,41 @@
+---
+mruby:
+  version: 3.1.0
+  release_no: 30100
+builds:
+  host:
+    https://github.com/mattn/mruby-json.git:
+      url: https://github.com/mattn/mruby-json.git
+      branch: HEAD
+      commit: f99d9428025469f2400f93c53b185f65f963e507
+      version: 0.0.0
+    https://github.com/matsumoto-r/mruby-mrbgem-template.git:
+      url: https://github.com/matsumoto-r/mruby-mrbgem-template.git
+      branch: HEAD
+      commit: 92f23d3c4f393f715dcfb3b1542c5eec14a0b25d
+      version: 0.3.1
+    https://github.com/iij/mruby-dir.git:
+      url: https://github.com/iij/mruby-dir.git
+      branch: HEAD
+      commit: 89dceefa1250fb1ae868d4cb52498e9e24293cd1
+      version: 0.0.0
+    https://github.com/fastly/mruby-optparse.git:
+      url: https://github.com/fastly/mruby-optparse.git
+      branch: HEAD
+      commit: e6397a090d1efe04d5dab57c63897f0d79bbad89
+      version: 0.0.0
+    https://github.com/IceDragon200/mruby-catch-throw:
+      url: https://github.com/IceDragon200/mruby-catch-throw
+      branch: HEAD
+      commit: 2b6eaff4232b4a9473b864df53c2917080af5dcf
+      version: 1.1.0
+    https://github.com/iij/mruby-env.git:
+      url: https://github.com/iij/mruby-env.git
+      branch: HEAD
+      commit: 056ae324451ef16a50c7887e117f0ea30921b71b
+      version: 0.0.0
+    https://github.com/mattn/mruby-onig-regexp.git:
+      url: https://github.com/mattn/mruby-onig-regexp.git
+      branch: HEAD
+      commit: 20ba3325d6fa504cbbf193e1b2a90e20fdab544f
+      version: 0.0.0

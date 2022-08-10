@@ -1,0 +1,18 @@
+[package]
+name = "minutus-mrbgem-template"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[build-dependencies]
+minutus = { path = "../minutus", features = ["mruby_3_1_0"] }
+
+[dependencies]
+minutus = { path = "../minutus", features = ["mruby_3_1_0"] }
+maplit = "*"
+argopt = "0.3.0"
+convert_case = "*"
+anyhow = "*"
+tera = "*"
+lazy_static = "*"
