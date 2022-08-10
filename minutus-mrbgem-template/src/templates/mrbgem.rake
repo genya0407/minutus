@@ -7,6 +7,7 @@ MRuby::Gem::Specification.new('{{ mrbgem_name }}') do |spec|
   spec.linker.library_paths << "#{__dir__}/target/release"
 
   if RbConfig::CONFIG['host_os'].downcase.include?('linux')
+    spec.linker.libraries << 'dl'
     spec.linker.flags << '-pthread'
   end
 
