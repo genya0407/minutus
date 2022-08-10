@@ -1,4 +1,4 @@
 ```shell-session
-$ cargo ws version --force '*' --no-git-push minor
+$ cargo ws version --force '*' --no-git-push patch
 $ git push --tags
 ```
