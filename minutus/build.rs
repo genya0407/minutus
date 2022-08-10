@@ -49,7 +49,14 @@ fn compile_bridge(out_dir: &Path) -> Result<()> {
     let output = std::process::Command::new("ruby")
         .args(&["all.rb"])
         .current_dir(Path::new("src").join("bridge"))
-        .output()?;
+        .output();
+    let output = match output {
+        Ok(o) => o,
+        Err(e) => {
+            println!("cargo:warning={}", e);
+            panic!("{}", e);
+        }
+    };
     if !output.status.success() {
         eprintln!("{}", String::from_utf8(output.stderr)?);
         return Err(anyhow!("Failed to execute command"));
