@@ -1,12 +1,9 @@
 [workspace]
-
 members = [
     "minutus",
     "minutus-macros",
-    "minutus-macros-type",
     "minutus-mruby-build-utils",
     "minutus-mrbgem-template",
     "minutus-test",
 ]
-
 exclude = ["examples"]

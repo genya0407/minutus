@@ -1,4 +1,4 @@
-fn define_tuple(n: usize) -> proc_macro2::TokenStream {
+pub fn define_tuple(n: usize) -> proc_macro2::TokenStream {
     let ty: Vec<_> = (1..=n)
         .into_iter()
         .map(|i| quote::format_ident!("T{}", i as usize))
@@ -42,18 +42,6 @@ fn define_tuple(n: usize) -> proc_macro2::TokenStream {
             }
         }
 
-    };
-    q.into()
-}
-
-#[proc_macro]
-pub fn define_tuples(_item: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    let definitions: Vec<_> = (1..=32).map(|i| define_tuple(i)).collect();
-
-    let q = quote::quote! {
-        #(
-            #definitions
-        )*
     };
     q.into()
 }

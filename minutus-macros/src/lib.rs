@@ -8,6 +8,19 @@ mod class_deriviation_generator;
 mod funcall_generator;
 mod method_generator;
 mod name_generator;
+mod tuple;
+
+#[proc_macro]
+pub fn define_tuples(_item: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let definitions: Vec<_> = (1..=32).map(|i| tuple::define_tuple(i)).collect();
+
+    let q = quote::quote! {
+        #(
+            #definitions
+        )*
+    };
+    q.into()
+}
 
 #[proc_macro_attribute]
 pub fn wrap(attrs: TokenStream, input: TokenStream) -> TokenStream {
