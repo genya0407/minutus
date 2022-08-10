@@ -5,6 +5,15 @@ use std::path::Path;
 use minutus_mruby_build_utils::MRubyBuilder;
 
 fn main() -> Result<()> {
+    if std::process::Command::new("ruby")
+        .arg("-v")
+        .output()
+        .is_err()
+    {
+        println!("cargo:warning=ruby command does not exist");
+        panic!("ruby command does not exist");
+    }
+
     println!("cargo:rerun-if-changed=src/bridge");
     println!("cargo:rerun-if-changed=build.rs");
 
