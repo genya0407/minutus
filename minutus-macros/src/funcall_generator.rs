@@ -205,15 +205,13 @@ pub fn define_funcall(input: TokenStream) -> TokenStream {
 
             let method_sig = quote! {
                 fn #method_name(
-                    &self, mrb: *mut ::minutus::mruby::minu_state
-                    #(,#argument_name:#argument_type)*
+                    &self #(,#argument_name:#argument_type)*
                 ) #return_signature;
             };
 
             let method_body = quote! {
                 fn #method_name(
-                    &self, mrb: *mut ::minutus::mruby::minu_state
-                    #(,#argument_name:#argument_type)*
+                    &self #(,#argument_name:#argument_type)*
                 ) #return_signature {
                     use ::minutus::types::*;
                     use ::minutus::data::*;
@@ -223,20 +221,20 @@ pub fn define_funcall(input: TokenStream) -> TokenStream {
                     let mrb_method_name_cstr = std::ffi::CString::new(mrb_method_name).unwrap();
                     unsafe {
                         #(
-                            let #argument_name = #argument_name.into_mrb(mrb);
+                            let #argument_name = #argument_name.into_mrb(self.mrb);
                         )*
                         let result = minu_funcall(
-                            mrb,
-                            *self,
+                            self.mrb,
+                            self.val,
                             mrb_method_name_cstr.as_ptr(),
                             #argc as _,
                             #(#argument_name),*
                         );
                         if minu_exception_p(result) {
-                            let e = String::from_mrb(mrb, &minu_inspect(mrb, result));
+                            let e = String::from_mrb(self.mrb, &minu_inspect(self.mrb, result));
                             panic!("{}", e);
                         }
-                        <#return_type>::from_mrb(mrb, &result)
+                        <#return_type>::from_mrb(self.mrb, &result)
                     }
                 }
             };
@@ -253,7 +251,7 @@ pub fn define_funcall(input: TokenStream) -> TokenStream {
             #(#method_sig)*
         }
 
-        impl #trait_name for ::minutus::mruby::minu_value {
+        impl #trait_name for ::minutus::types::MinuValue {
             #(#method_body)*
         }
     }

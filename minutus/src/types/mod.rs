@@ -6,10 +6,14 @@ mod float;
 mod hash;
 mod integer;
 mod option;
+mod r_symbol;
 mod string;
 mod tuples;
 mod unit;
 mod values;
+
+pub use r_symbol::*;
+pub use values::*;
 
 pub trait IntoMrb {
     fn into_mrb(self, mrb: *mut minu_state) -> minu_value;

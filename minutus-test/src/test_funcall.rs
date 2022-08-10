@@ -52,20 +52,18 @@ fn assert_regex_match(pat: &str, val: &str) {
     assert!(re.is_match(val))
 }
 
-use minutus::mruby::*;
-
 minutus::define_funcall! {
     fn inspect(self) -> String;
-    fn inspect_2(self) -> minu_value => "to_s";
+    fn inspect_2(self) -> MinuValue => "to_s";
 }
 
 #[test]
 pub fn test_define_funcall() {
     let runtime = minutus::build_simple_evaluator();
     let retval = runtime.evaluate("123").unwrap();
-    let inspected = retval.inspect(runtime.mrb());
+    let inspected = retval.inspect();
     println!("{}", inspected);
-    let inspected = retval.inspect_2(runtime.mrb());
-    let inspected = inspected.inspect(runtime.mrb());
+    let inspected = retval.inspect_2();
+    let inspected = inspected.inspect();
     println!("{}", inspected);
 }

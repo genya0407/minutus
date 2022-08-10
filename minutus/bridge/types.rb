@@ -7,6 +7,7 @@ types = %w[
   int
   float
   bool
+  sym
 ]
 
 type_c = ERB.new(<<~TEMPLATE).result

@@ -1,7 +1,8 @@
 use crate::mruby::*;
+use crate::types::*;
 
-pub fn build_simple_evaluator() -> Evaluator<minu_value> {
-    Evaluator::<minu_value>::build(|_| {}, |_mrb, value| *value)
+pub fn build_simple_evaluator() -> Evaluator<MinuValue> {
+    Evaluator::<MinuValue>::build(|_| {}, MinuValue::from_mrb)
 }
 
 pub struct Evaluator<EvaluationResult> {

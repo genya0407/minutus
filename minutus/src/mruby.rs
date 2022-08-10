@@ -4,7 +4,7 @@
 #![allow(dead_code)]
 
 // types
-pub use internal::{minu_aspec, minu_bool, minu_float, minu_int, minu_state, minu_value};
+pub use internal::{minu_aspec, minu_bool, minu_float, minu_int, minu_state, minu_sym, minu_value};
 pub use internal::{RArray, RBasic, RClass, RData, RException, RHash, RObject, RProc, RString};
 
 // predicates
@@ -67,6 +67,9 @@ pub use internal::{minu_gc_register, minu_gc_unregister};
 pub use internal::{
     minu_exc_backtrace, minu_get_backtrace, minu_print_backtrace, minu_print_error,
 };
+
+// Symbol
+pub use internal::{minu_intern_cstr, minu_obj_to_sym, minu_sym2name, minu_symbol_value};
 
 // other
 pub use internal::{minu_close, minu_inspect, minu_load_string, minu_open};

@@ -20,6 +20,13 @@ impl IntoMrb for String {
     }
 }
 
+impl IntoMrb for &str {
+    fn into_mrb(self, mrb: *mut minu_state) -> minu_value {
+        let cstr = std::ffi::CString::new(self).unwrap();
+        unsafe { minu_str_new_cstr(mrb, cstr.as_ptr()) }
+    }
+}
+
 // impl FromMrb<Self> for Vec<u8> {
 //     fn from_mrb(mrb: *mut minu_state, value: &minu_value) -> Self {
 //         unsafe {

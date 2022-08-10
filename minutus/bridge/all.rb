@@ -31,6 +31,7 @@ files = %w[
   hash
   gc
   exception
+  symbol
   other
 ]
 contents = files.map do |name|
