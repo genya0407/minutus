@@ -1,16 +1,16 @@
 use anyhow::{anyhow, Result};
 use std::path::Path;
 
-fn run_command(current_dir: &Path, cmd: &[&str]) -> Result<()> {
+fn run_command(current_dir: &Path, cmd: &[&str]) -> Result<String> {
     println!("Start: {:?}", cmd);
 
-    let status = std::process::Command::new(cmd[0])
+    let output = std::process::Command::new(cmd[0])
         .args(&cmd[1..])
         .current_dir(current_dir)
-        .status()?;
+        .output()?;
 
-    if status.success() {
-        Ok(())
+    if output.status.success() {
+        Ok(String::from_utf8_lossy(&output.stdout).to_string())
     } else {
         Err(anyhow!(format!("Executing {:?} failed", cmd)))
     }
@@ -31,20 +31,34 @@ impl<'a> MRubyBuilder<'a> {
     }
 
     fn internal_link_mruby(&self, build_config_path: Option<&Path>) -> Result<()> {
-        let search_dir = self
-            .base_dir
-            .join("mruby")
-            .join("build")
-            .join("host")
-            .join("lib");
-        let cmd = if let Some(path) = build_config_path {
-            format!("rake clean all MRUBY_CONFIG={}", path.to_string_lossy())
+        let mruby_config = self.base_dir.join("mruby").join("bin").join("mruby-config");
+        if let Some(path) = build_config_path {
+            let c = &[
+                "rake",
+                "all",
+                &format!("MRUBY_CONFIG={}", path.to_string_lossy()),
+            ];
+            run_command(&self.base_dir.join("mruby"), c)?;
         } else {
-            String::from("rake clean all")
+            let c = &["rake", "all"];
+            run_command(&self.base_dir.join("mruby"), c)?;
         };
-        run_command(&self.base_dir.join("mruby"), &["sh", "-c", &cmd])?;
-        println!("cargo:rustc-link-lib=mruby");
-        println!("cargo:rustc-link-search={}", search_dir.to_string_lossy());
+
+        let ldflags_before_libs = run_command(
+            self.base_dir,
+            &[mruby_config.to_str().unwrap(), "--ldflags-before-libs"],
+        )?;
+        let ldflags = run_command(
+            self.base_dir,
+            &[mruby_config.to_str().unwrap(), "--ldflags"],
+        )?;
+        let libs = run_command(self.base_dir, &[mruby_config.to_str().unwrap(), "--libs"])?;
+        println!(
+            "cargo:rustc-flags={} {} {}",
+            ldflags_before_libs.trim(),
+            ldflags.trim(),
+            libs.trim()
+        );
         Ok(())
     }
 
