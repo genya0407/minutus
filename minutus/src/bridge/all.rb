@@ -1,7 +1,5 @@
 require 'erb'
 
-OUT="#{__dir__}/../src/bridge.c"
-
 headers = <<~HEAD
 #include "mruby.h"
 #include "mruby/data.h"
@@ -38,5 +36,11 @@ contents = files.map do |name|
   `ruby #{name}.rb`
 end
 all = [headers, *contents].join("\n")
-File.write(OUT, all)
-system("clang-format -i #{OUT}", exception: true)
+
+require 'open3'
+
+stdin, stdout, _ = *Open3.popen3('clang-format')
+stdin.write(all)
+stdin.close
+
+puts stdout.read

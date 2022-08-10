@@ -5,7 +5,7 @@ use std::path::Path;
 use minutus_mruby_build_utils::MRubyBuilder;
 
 fn main() -> Result<()> {
-    println!("cargo:rerun-if-changed=bridge");
+    println!("cargo:rerun-if-changed=src/bridge");
     println!("cargo:rerun-if-changed=build.rs");
 
     let out_dir_str = env::var("OUT_DIR")?;
@@ -45,17 +45,24 @@ fn mruby_version() -> String {
 }
 
 fn compile_bridge(out_dir: &Path) -> Result<()> {
-    let mruby_include_path = Path::new(out_dir).join("mruby").join("include");
-    let out_path = Path::new(out_dir).join("mruby.rs");
-
-    let status = std::process::Command::new("ruby")
+    // generate bridge.c
+    let output = std::process::Command::new("ruby")
         .args(&["all.rb"])
-        .current_dir("bridge")
-        .status()?;
-    if !status.success() {
+        .current_dir(Path::new("src").join("bridge"))
+        .output()?;
+    if !output.status.success() {
+        eprintln!("{}", String::from_utf8(output.stderr)?);
         return Err(anyhow!("Failed to execute command"));
     }
+    std::fs::write(out_dir.join("bridge.c"), output.stdout)?;
 
+    // generate binding
+    println!("Start generating binding");
+
+    let mruby_include_path = Path::new(out_dir).join("mruby").join("include");
+    println!("include path: {}", mruby_include_path.to_str().unwrap());
+
+    let out_path = Path::new(out_dir).join("mruby.rs");
     let allowlist_types = &[
         "minu_.*",
         "RClass",
@@ -74,14 +81,9 @@ fn compile_bridge(out_dir: &Path) -> Result<()> {
         "RException",
     ];
     let allowlist_functions = &["minu_.*", "mrb_raise", "mrb_get_args"];
-
-    println!("Start generating binding");
-
-    println!("include path: {}", mruby_include_path.to_str().unwrap());
-
     let bindings = bindgen::Builder::default()
         .clang_arg(format!("-I{}", mruby_include_path.to_str().unwrap()))
-        .header(Path::new("src").join("bridge.c").to_string_lossy())
+        .header(out_dir.join("bridge.c").to_string_lossy())
         .allowlist_type(allowlist_types.join("|"))
         .allowlist_function(allowlist_functions.join("|"))
         .layout_tests(false)
@@ -92,10 +94,11 @@ fn compile_bridge(out_dir: &Path) -> Result<()> {
 
     println!("Finish generating binding");
 
+    // Compile
     println!("Start compiling binding");
 
     cc::Build::new()
-        .file(Path::new("src").join("bridge.c"))
+        .file(out_dir.join("bridge.c"))
         .include(mruby_include_path)
         .compile("minutus_bridge");
 

@@ -1,8 +1,11 @@
 fn main() {
     println!("cargo:rerun-if-changed=build_config.rb");
 
+    let out_dir_str = std::env::var("OUT_DIR").unwrap();
+    let base_dir = std::path::Path::new(&out_dir_str);
+
     let builder = minutus::MRubyBuilder {
-        base_dir: &std::env::current_dir().unwrap(),
+        base_dir: &base_dir,
         mruby_version: String::from("3.1.0"),
     };
     builder.download_mruby().unwrap();
