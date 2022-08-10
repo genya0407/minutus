@@ -4,15 +4,20 @@ use std::path::Path;
 
 use minutus_mruby_build_utils::MRubyBuilder;
 
-fn main() -> Result<()> {
-    if std::process::Command::new("ruby")
-        .arg("-v")
+fn check_command(cmd: &[&str]) {
+    if std::process::Command::new(cmd[0])
+        .args(&cmd[1..])
         .output()
         .is_err()
     {
         println!("cargo:warning=ruby command does not exist");
         panic!("ruby command does not exist");
     }
+}
+
+fn main() -> Result<()> {
+    check_command(&["ruby", "-v"]);
+    check_command(&["clang-format", "--help"]);
 
     println!("cargo:rerun-if-changed=src/bridge");
     println!("cargo:rerun-if-changed=build.rs");
