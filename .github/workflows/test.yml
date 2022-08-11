@@ -2,7 +2,8 @@ name: Test
 
 on: [push, pull_request]
 jobs:
-  build:
+  cargo_test:
+    name: cargo test
     strategy:
       matrix:
         mruby_version:
@@ -25,7 +26,27 @@ jobs:
           toolchain: stable
           override: true
       - run: cargo test -vv --features mruby_${{ matrix.mruby_version }}
+
+  mrbgem_template_test:
+    name: mrbgem-template test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+      - uses: Swatinem/rust-cache@v2
       - run: cd minutus-mrbgem-template && ./test.sh
       - run: cd minutus-mrbgem-template && ./test_with_dependency.sh
+
+  examples_test:
+    name: examples test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+      - uses: Swatinem/rust-cache@v2
       - run: cd examples/custom-mruby && cargo run
       - run: cd examples/mruby-polars && rake test
