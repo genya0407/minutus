@@ -1,3 +1,4 @@
 /target
 /mruby
 /Cargo.lock
+/.github_actions_build_config.rb.lock
