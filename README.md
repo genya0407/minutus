@@ -192,8 +192,6 @@ Rust's `bool` cast to mruby's `true` or `false`.
 Currently, only [3.1.0](https://github.com/mruby/mruby/releases/tag/3.1.0) is supported.
 You can use `mruby_master` feature, but it is not guaranteed to work.
 
-Contribution to suppot master branch is welcome.
-
 ## Naming
 
 Minutus is an antonym of [Magnus](https://github.com/matsadler/magnus),
