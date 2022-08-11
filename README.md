@@ -187,6 +187,13 @@ See [minutus/src/types](minutus/src/types) for details.
 Any value in mruby can be cast to Rust's `bool`.
 Rust's `bool` cast to mruby's `true` or `false`.
 
+## Supported mruby versions
+
+Currently, only [3.1.0](https://github.com/mruby/mruby/releases/tag/3.1.0) is supported.
+You can use `mruby_master` feature, but it is not guaranteed to work.
+
+Contribution to suppot master branch is welcome.
+
 ## Naming
 
 Minutus is an antonym of [Magnus](https://github.com/matsadler/magnus),
