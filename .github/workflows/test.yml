@@ -1,5 +1,3 @@
-# https://github.com/motemen/slack-stream-json/blob/97d3745dcc8931a1d75217573d5ca60705be632f/.github/workflows/release.yml
-
 name: Test
 
 on: [push, pull_request]
