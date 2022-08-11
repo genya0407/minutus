@@ -18,6 +18,5 @@ minutus-mruby-build-utils = { version = "0.2", path = "../minutus-mruby-build-ut
 
 [features]
 mruby_3_1_0 = []
-mruby_2_1_2 = []
 mruby_master = []
 link_mruby = []
