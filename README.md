@@ -1,6 +1,8 @@
 # Minutus
 
-[![minutus](https://img.shields.io/crates/v/minutus.svg)](https://crates.io/crates/minutus) ![ci status](https://github.com/genya0407/minutus/actions/workflows/test.yml/badge.svg) ![license](https://img.shields.io/github/license/genya0407/minutus)
+[![minutus](https://img.shields.io/crates/v/minutus.svg)](https://crates.io/crates/minutus)
+![ci status](https://github.com/genya0407/minutus/actions/workflows/test.yml/badge.svg)
+![license](https://img.shields.io/github/license/genya0407/minutus)
 
 Heavily inspired by [Magnus](https://github.com/matsadler/magnus).
 
@@ -44,8 +46,8 @@ fn main() {
     // capture mruby's main object
     let main = runtime.evaluate("self").unwrap();
 
-    // call `some_method` on main object from Rust world
-    // args and return value are type-casted in a sensible manner, according to `define_funcall!` definition
+    // call `some_method` on main object from Rust world.
+    // in / out values are type-casted, according to `define_funcall!` definition
     let retval: i64 = main.some_method(vec![1,2,3,4]);
     println!("retval is {}", retval);
 }
@@ -111,8 +113,6 @@ Warning: 0
    Time: 0.06 seconds
 ```
 
-Edit `src/lib.rs` to write Rust code, and edit `mrbgem/mrb_testmrbgem.rb` to write mruby code.
-
 ## Connect mruby's class and Rust's struct
 
 You can bind Rust's struct with mruby's class.
@@ -125,9 +125,9 @@ If you generate mrbgem by `minutus-mrbgem-template`, `src/lib.rs` includes an ex
 /*
   `minutus::wrap` does:
 
-  - Define corresponding mruby class. In this example, `TestMrbgem` class is defined.
-  - Define methods for the class. In order to define methods, the functions must be marked by `minutus::class_method` or `minutus::method` macros.
-
+  - Define mruby class. In this example, `TestMrbgem` class is defined.
+  - Define bind methods to the class.
+    - The functions must be marked by `class_method` macro or `method` macro.
 */
 #[minutus::wrap(class_method = "new", method = "distance", method = "name_with_prefix")]
 struct TestMrbgem {
@@ -155,10 +155,10 @@ impl TestMrbgem {
     }
 }
 
-// mrb_mruby_test_mrbgem_gem_init / mrb_mruby_test_mrbgem_gem_final are recognized by mruby, and executed when this mrbgem is loaded.
+// These functions are recognized by mruby and executed when this mrbgem is loaded.
 #[no_mangle]
 pub extern "C" fn mrb_mruby_test_mrbgem_gem_init(mrb: *mut minutus::mruby::minu_state) {
-    // If you define classes, you must call `define_class_on_mrb` here to have mruby recognize the class.
+    // You must call `define_class_on_mrb` here to have mruby recognize the class.
     TestMrbgem::define_class_on_mrb(mrb);
 }
 
@@ -182,10 +182,12 @@ See [minutus/src/types](minutus/src/types) for details.
 | `std::collections::HashMap<T, U>` | `Hash` |
 | `minutus::types::RSymbol` | `Symbol` |
 | `bool` | any object |
-| `MrbData` (structs bound with mruby's class by `minutus::wrap`) | corresponding class |
+| `MrbData` (structs marked by `minutus::wrap`) | corresponding class |
 
-Any value in mruby can be cast to Rust's `bool`. Rust's `bool` cast to mruby's `true` or `false`.
+Any value in mruby can be cast to Rust's `bool`.
+Rust's `bool` cast to mruby's `true` or `false`.
 
 ## Naming
 
-Minutus is an antonym of [Magnus](https://github.com/matsadler/magnus), which means _small_.
+Minutus is an antonym of [Magnus](https://github.com/matsadler/magnus),
+which means _small_.
