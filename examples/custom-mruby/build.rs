@@ -3,8 +3,6 @@ use std::path::Path;
 fn main() {
     println!("cargo:rerun-if-changed=bulid.rs");
     println!("cargo:rerun-if-changed=build_config.rb");
-    println!("cargo:rustc-link-arg=-Wl,--no-as-needed");
-    println!("cargo:rustc-link-arg=-lmruby");
     let out_dir = std::env::var("OUT_DIR").unwrap();
     let out_dir = Path::new(&out_dir);
 
