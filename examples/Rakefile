@@ -1,0 +1,8 @@
+task :run_all do
+  cargo_clean = ENV["CLEAN"] ? '&& cargo clean' : ''
+  rake_clean = ENV["CLEAN"] ? 'clean' : ''
+
+  sh "cd plane-mruby #{cargo_clean} && cargo run"
+  sh "cd custom-mruby #{cargo_clean} && cargo run"
+  sh "cd mruby-polars && rake #{rake_clean} test"
+end

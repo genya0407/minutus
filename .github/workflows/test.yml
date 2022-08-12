@@ -51,4 +51,4 @@ jobs:
         with:
           toolchain: stable
           override: true
-      - run: examples/run_examples.sh
+      - run: cd examples && rake run_all
