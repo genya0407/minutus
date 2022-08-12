@@ -47,6 +47,8 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.1'
-      - uses: Swatinem/rust-cache@v2
-      - run: cd examples/custom-mruby && cargo run
-      - run: cd examples/mruby-polars && rake test
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - run: examples/run_examples.sh

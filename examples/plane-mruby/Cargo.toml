@@ -1,0 +1,10 @@
+[package]
+name = "plane-mruby"
+version = "0.1.0"
+edition = "2021"
+
+# workaround ignoring minutus's workspace
+[workspace]
+
+[dependencies]
+minutus = { path = "../../minutus", features = ["mruby_3_1_0", "link_mruby"] }
