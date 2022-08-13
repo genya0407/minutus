@@ -38,11 +38,11 @@ use minutus::Evaluator;
 pub fn test_funcall() {
     let runtime = Evaluator::build(Point::define_class_on_mrb, Point::from_mrb);
     let point = runtime.evaluate("Point.new(1,2,'test')").unwrap();
-    assert_regex_match(r"#<Point:0x[0-9a-f]+>", &point.inspect_2(runtime.mrb()));
-    assert_regex_match(r"#<Point:0x[0-9a-f]+>", &point.to_s(runtime.mrb()));
+    assert_regex_match(r"#<Point:0x[0-9a-f]+>", &point.inspect_2());
+    assert_regex_match(r"#<Point:0x[0-9a-f]+>", &point.to_s());
     assert_regex_match(
         r"#<Point:0x[0-9a-f]+>",
-        &Point::new_2(runtime.mrb(), 100, 200, String::from("hogeee")).to_s(runtime.mrb()),
+        &Point::new_2(runtime.mrb(), 100, 200, String::from("hogeee")).to_s(),
     );
     assert_eq!("Point", &Point::name(runtime.mrb()));
 }

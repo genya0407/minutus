@@ -4,7 +4,18 @@ use crate::{mruby::*, types::FromMrb};
 // new 関数を作って register, drop するときに unregister すれば大丈夫な気がする
 pub struct DataPtr<T: Sized> {
     rusty_value_ptr: *mut T,
-    pub minu_value: minu_value,
+    minu_value: minu_value,
+    mrb: *mut minu_state,
+}
+
+impl<T: Sized> DataPtr<T> {
+    pub fn minu_value(&self) -> minu_value {
+        self.minu_value
+    }
+
+    pub fn mrb(&self) -> *mut minu_state {
+        self.mrb
+    }
 }
 
 impl<T> std::ops::Deref for DataPtr<T> {
@@ -28,6 +39,7 @@ pub trait MrbData: Sized {
                 rusty_value_ptr: minu_data_get_ptr(mrb, *value, Self::minu_data_type())
                     as *mut Self,
                 minu_value: (*value).clone(),
+                mrb,
             }
         }
     }
