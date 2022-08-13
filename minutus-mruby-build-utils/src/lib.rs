@@ -9,6 +9,7 @@ pub struct MRubyManager {
     mruby_version: Option<String>,
     do_link: bool,
     build_config: Option<PathBuf>,
+    do_download: bool,
 }
 
 impl MRubyManager {
@@ -20,6 +21,7 @@ impl MRubyManager {
             mruby_version: None,
             do_link: true,
             build_config: None,
+            do_download: true,
         }
     }
 
@@ -51,6 +53,14 @@ impl MRubyManager {
         self
     }
 
+    /// Whether the builder should internally download mruby source code or not. The default is `true`.
+    ///
+    /// If set to `false` you have to place `$OUT_DIR/mruby` by yourself.
+    pub fn download(mut self, doit: bool) -> Self {
+        self.do_download = doit;
+        self
+    }
+
     /// Run the task.
     pub fn run(self) {
         let workdir = self.workdir.unwrap_or_else(|| {
@@ -66,9 +76,14 @@ impl MRubyManager {
             .build_config
             .unwrap_or(Path::new("default").to_path_buf()); // see: https://github.com/mruby/mruby/blob/3.1.0/doc/guides/compile.md#build
 
-        download_mruby(&workdir, &mruby_version);
+        if self.do_download {
+            download_mruby(&workdir, &mruby_version);
+        }
         build_mruby(&workdir, &build_config);
-        link_mruby(&workdir);
+
+        if self.do_link {
+            link_mruby(&workdir);
+        }
     }
 }
 

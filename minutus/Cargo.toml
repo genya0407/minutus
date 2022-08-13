@@ -15,6 +15,9 @@ minutus-mruby-build-utils = { version = "0.3.0", path = "../minutus-mruby-build-
 anyhow = "1.0"
 bindgen = "0.60.1"
 cc = "1.0.73"
+bytes = "1.2.1"
+tar = "0.4.38"
+flate2 = "1.0.24"
 
 [dependencies]
 minutus-macros = { version = "0.3.0", path = "../minutus-macros" }

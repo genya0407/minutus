@@ -15,9 +15,60 @@ fn check_command(cmd: &[&str]) {
     }
 }
 
-fn main() -> Result<()> {
-    check_command(&["ruby", "-v"]);
+fn extract_mruby_source_code() -> Result<()> {
+    let workdir = env::var("OUT_DIR")?;
+    let workdir = Path::new(&workdir);
 
+    let archive_path = env::current_dir()?
+        .join("mrubies")
+        .join(format!("{}.tar.gz", mruby_version()));
+    if !archive_path.exists() {
+        println!("cargo:warning={} does not exist", archive_path.display());
+        return Err(anyhow!("{} does not exist", archive_path.display()));
+    }
+
+    if workdir.join("mruby").exists() {
+        return Ok(());
+    }
+
+    let tar_gz = std::fs::read(archive_path)?;
+    let tar = {
+        use bytes::Buf;
+        flate2::read::GzDecoder::new(tar_gz.reader())
+    };
+    let mut archive = tar::Archive::new(tar);
+    archive.unpack(&workdir).unwrap();
+
+    std::fs::rename(
+        workdir.join(format!("mruby-{}", mruby_version())),
+        workdir.join("mruby"),
+    )?;
+
+    Ok(())
+}
+
+fn build_on_doc_rs() -> Result<()> {
+    extract_mruby_source_code()?;
+    MRubyManager::new()
+        .mruby_version(&mruby_version())
+        .link(true)
+        .download(false)
+        .run();
+    compile_bridge()?;
+
+    println!("Finish build.rs");
+
+    Ok(())
+}
+
+fn main() -> Result<()> {
+    // docs.rs does not allow network access. So we need different settings.
+    if std::env::var("DOCS_RS").is_ok() {
+        build_on_doc_rs()?;
+        return Ok(());
+    }
+
+    check_command(&["ruby", "-v"]);
     println!("cargo:rerun-if-changed=src/bridge");
     println!("cargo:rerun-if-changed=build.rs");
 
