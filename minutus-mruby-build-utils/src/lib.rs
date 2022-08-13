@@ -59,6 +59,13 @@ impl<'a> MRubyBuilder<'a> {
             ldflags.trim(),
             libs.trim()
         );
+
+        // For build on environments where `-Wl,--as-needed` is the default.
+        if cc::Build::new().is_flag_supported("-Wl,--no-as-needed")? {
+            println!("cargo:rustc-link-arg=-Wl,--no-as-needed");
+            println!("cargo:rustc-link-arg=-lmruby");
+        }
+
         Ok(())
     }
 

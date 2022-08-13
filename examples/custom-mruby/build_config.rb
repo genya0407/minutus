@@ -1,6 +1,5 @@
 MRuby::Build.new do |conf|
-  conf.toolchain :clang
-  
+  toolchain
   conf.gembox 'default'
   conf.gem github: 'mattn/mruby-json'
 end

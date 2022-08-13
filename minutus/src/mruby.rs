@@ -8,30 +8,11 @@ pub use internal::{minu_aspec, minu_bool, minu_float, minu_int, minu_state, minu
 pub use internal::{RArray, RBasic, RClass, RData, RException, RHash, RObject, RProc, RString};
 
 // predicates
-macro_rules! predicate {
-    ($pred:ident) => {
-        pub unsafe fn $pred(v: minu_value) -> bool {
-            // in mruby 3.1.0, pred's return value is bool, however in mruby 2.1.2 it is u8
-            // so we cast return value into u8, and then compare to 1
-            internal::$pred(v) as u8 == 1
-        }
-    };
-}
-
-predicate!(minu_array_p);
-predicate!(minu_class_p);
-predicate!(minu_data_p);
-predicate!(minu_exception_p);
-predicate!(minu_false_p);
-predicate!(minu_fixnum_p);
-predicate!(minu_float_p);
-predicate!(minu_hash_p);
-predicate!(minu_module_p);
-predicate!(minu_nil_p);
-predicate!(minu_object_p);
-predicate!(minu_range_p);
-predicate!(minu_string_p);
-predicate!(minu_true_p);
+pub use internal::{
+    minu_array_p, minu_class_p, minu_data_p, minu_exception_p, minu_false_p, minu_fixnum_p,
+    minu_float_p, minu_hash_p, minu_module_p, minu_nil_p, minu_object_p, minu_range_p,
+    minu_string_p, minu_true_p,
+};
 
 // generates minu_value
 pub use internal::{minu_false_value, minu_nil_value, minu_true_value};
