@@ -7,21 +7,22 @@
 
 Heavily inspired by [Magnus](https://github.com/matsadler/magnus).
 
-By minutus, you can do:
+By minutus, you can easily [embed mruby in Rust](#embed-mruby-in-rust),
+and [create mrbgem by Rust](#create-mrbgem-by-rust).
 
-- [Embed mruby in Rust](#embed-mruby-in-rust)
-- [Create mrbgem by Rust](#create-mrbgem-by-rust)
-- [Connect mruby's class and Rust's struct](#connect-mrubys-class-and-rusts-struct)
+Minutus also provides sensible [type casting](#type-casting),
+and you can [define typed functions to mruby values](#define-typed-functions-to-mruby-values)
+and [wrap rust structs in mruby objects](#wrap-rust-structs-in-mruby-objects).
 
 ## Embed mruby in Rust
 
-First, add minutus to your crate's dependencies.
+Add minutus to your crate's dependencies.
 
 ```shell-session
 cargo add minutus --features mruby_3_1_0,link_mruby
 ```
 
-Then, write code like:
+Write code like:
 
 ```rust
 // src/main.rs
@@ -54,7 +55,7 @@ fn main() {
 }
 ```
 
-And now, you can run your code:
+Then, you can run your code:
 
 ```shell-session
 $ cargo run
@@ -63,47 +64,40 @@ $ cargo run
 retval is 10
 ```
 
-If you want to use custom `build_config.rb` (e.g. for using mrbgems), you have to:
+If you want to use custom `build_config.rb` (e.g. for using mrbgems),
+you have to write custom `build.rs`
 
-1. Write your custom `build_config.rb`
-2. Write `build.rs`
-
-Minutus provides helpers for this purpose. See [examples/custom-mruby](/examples/custom-mruby).
+Minutus provides a helper for this purpose. See [examples/custom-mruby](/examples/custom-mruby).
 
 ## Create mrbgem by Rust
 
-Install `minutus-mrbgem-template`:
+Install `minutus-mrbgem-template` and initialize mrbgem.
 
 ```shell-session
-cargo install minutus-mrbgem-template
-```
-
-Initialize mrbgem:
-
-```shell-session
-$ minutus-mrbgem-template mruby-test-mrbgem
-$ cd mruby-test-mrbgem
-$ tree
-.
+$ cargo install minutus-mrbgem-template
+$ minutus-mrbgem-template mruby-example
+$ tree mruby-example
+mruby-example
+├── Cargo.lock
 ├── Cargo.toml
 ├── LICENSE
 ├── README.md
 ├── Rakefile
 ├── mrbgem.rake
 ├── mrblib
-│   └── mrb_testmrbgem.rb
-├── mruby-test-mrbgem.gem
+│   └── mrb_example.rb
+├── mruby-example.gem
 ├── src
-│   ├── dummy.c
-│   └── lib.rs
+│   ├── dummy.c
+│   └── lib.rs
 └── test
-    └── mrb_test_mrbgem.rb
+    └── mrb_example.rb
 ```
 
 Now, you can build and test mrbgem.
 
 ```shell-session
-$ rake test
+$ cd mruby-example && rake test
 ...
   Total: 1456
      OK: 1449
@@ -114,22 +108,14 @@ Warning: 0
    Time: 0.06 seconds
 ```
 
-## Connect mruby's class and Rust's struct
+## Wrap Rust Structs in mruby Objects
 
-You can bind Rust's struct with mruby's class.
+You can wrap Rust's struct in mruby objects.
 
-If you generate mrbgem by `minutus-mrbgem-template`, `src/lib.rs` includes an example.
+The following example defines `TestMrbgem` class in mruby,
+which has class method `new`, and instance methods `distance` and `name_with_prefix`.
 
 ```rust
-// src/lib.rs
-
-/*
-  `minutus::wrap` does:
-
-  - Define mruby class. In this example, `TestMrbgem` class is defined.
-  - Define bind methods to the class.
-    - The functions must be marked by `class_method` macro or `method` macro.
-*/
 #[minutus::wrap(class_method = "new", method = "distance", method = "name_with_prefix")]
 struct TestMrbgem {
     x: i64,
@@ -138,13 +124,11 @@ struct TestMrbgem {
 }
 
 impl TestMrbgem {
-    // `minutus::class_method` marks the function as class method
     #[minutus::class_method]
     pub fn new(x: i64, y: i64, name: String) -> Self {
         Self { x, y, name }
     }
 
-    // `minutus::class_method` marks the function as instance method
     #[minutus::method]
     pub fn distance(&self, other: &TestMrbgem) -> f64 {
         (((self.x - other.x).pow(2) + (self.y - other.y).pow(2)) as f64).sqrt()
@@ -155,16 +139,24 @@ impl TestMrbgem {
         [prefix, self.name.clone()].join("_")
     }
 }
+```
 
-// These functions are recognized by mruby and executed when this mrbgem is loaded.
-#[no_mangle]
-pub extern "C" fn mrb_mruby_test_mrbgem_gem_init(mrb: *mut minutus::mruby::minu_state) {
-    // You must call `define_class_on_mrb` here to have mruby recognize the class.
-    TestMrbgem::define_class_on_mrb(mrb);
+## Define typed functions to mruby values
+
+Use `define_funcall!` macro.
+
+```rust
+minutus::define_funcall! {
+    fn inspect(self) -> String;
+    fn concat(self, other: Vec<&str>) -> Vec<String> => "+";
 }
 
-#[no_mangle]
-pub extern "C" fn mrb_mruby_test_mrbgem_gem_final(_mrb: *mut minutus::mruby::minu_state) {}
+fn main() {
+    let runtime = minutus::build_simple_evaluator();
+
+    let mruby_array: minutus::types::MinuValue = runtime.evaluate("['aaa', 'bbb']").unwrap();
+    assert_eq!("[\"aaa\", \"bbb\"]", mruby_array.inspect());
+    assert_eq!(vec![String::from("aaa"), String::from("bbb"), String::from("ccc")], mruby_array.concat(vec!["ccc"]));
 ```
 
 ## Type casting

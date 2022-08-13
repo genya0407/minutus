@@ -11,9 +11,9 @@ pub struct MRubyManager {
     build_config: Option<PathBuf>,
 }
 
-impl<'a> MRubyManager {
+impl MRubyManager {
     /// Construct a new instance of a blank set of configuration.
-    /// This builder is finished with the [`run`] function.
+    /// This builder is finished with the [run][`MRubyManager::run()`] function.
     pub fn new() -> Self {
         Self {
             workdir: None,
