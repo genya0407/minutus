@@ -1,11 +1,13 @@
 use super::*;
 
-impl IntoMrb for () {
-    fn into_mrb(self, _mrb: *mut minu_state) -> minu_value {
-        unsafe { minu_nil_value() }
+impl TryIntoMrb for () {
+    fn try_into_mrb(self, mrb: *mut minu_state) -> MrbResult<MrbValue> {
+        unsafe { Ok(MrbValue::new(mrb, minu_nil_value())) }
     }
 }
 
-impl FromMrb<()> for () {
-    fn from_mrb(_mrb: *mut minu_state, _val: &minu_value) -> () {}
+impl TryFromMrb for () {
+    fn try_from_mrb(_value: MrbValue) -> MrbResult<()> {
+        Ok(())
+    }
 }

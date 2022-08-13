@@ -2,21 +2,21 @@ use super::*;
 
 macro_rules! define_int {
     ($t:ty) => {
-        impl FromMrb<Self> for $t {
-            fn from_mrb(mrb: *mut minu_state, value: &minu_value) -> $t {
+        impl TryFromMrb for $t {
+            fn try_from_mrb(value: MrbValue) -> MrbResult<$t> {
                 unsafe {
-                    if minu_fixnum_p(*value) {
-                        minu_fixnum_func(*value) as $t
+                    if minu_fixnum_p(value.val) {
+                        Ok(minu_fixnum_func(value.val) as $t)
                     } else {
-                        crate::utils::raise_type_mismatch_argument_error(mrb, *value, "Fixnum")
+                        Err(MrbConversionError::new("Fixnum"))
                     }
                 }
             }
         }
 
-        impl IntoMrb for $t {
-            fn into_mrb(self, _mrb: *mut minu_state) -> minu_value {
-                unsafe { minu_fixnum_value(self as i64) }
+        impl TryIntoMrb for $t {
+            fn try_into_mrb(self, mrb: *mut minu_state) -> MrbResult<MrbValue> {
+                unsafe { Ok(MrbValue::new(mrb, minu_fixnum_value(self as i64))) }
             }
         }
     };

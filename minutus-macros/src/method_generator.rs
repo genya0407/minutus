@@ -1,6 +1,7 @@
 use crate::name_generator::*;
 use convert_case::Case::*;
 use convert_case::Casing;
+use darling::ToTokens;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
 use syn::Signature;
@@ -45,7 +46,7 @@ impl AbstractMethodGenerator for InstanceMethodGenerator {
     }
     fn function_call(&self) -> TokenStream {
         let original_function = &self.sig.ident;
-        quote! {(*Self::from_mrb(mrb, &mrb_self)).#original_function}
+        quote! { Self::try_from_mrb(MrbValue::new(mrb, mrb_self)).unwrap().#original_function}
     }
     fn minu_define_method_name(&self) -> Ident {
         format_ident!("minu_define_method")
@@ -100,6 +101,10 @@ pub trait AbstractMethodGenerator {
         let argument_info = self.argument_info();
         let rust_argument_name: Vec<_> = argument_info.iter().map(|ai| &ai.ident).collect();
         let argument_type: Vec<_> = argument_info.iter().map(|ai| &ai.ty).collect();
+        let argument_type_name: Vec<String> = argument_type
+            .iter()
+            .map(|i| format!("{}", i.to_token_stream()))
+            .collect();
         let type_alias: Vec<_> = rust_argument_name
             .iter()
             .map(|name| format_ident!("{}", format!("alias_{}", name).to_case(Camel)))
@@ -145,10 +150,21 @@ pub trait AbstractMethodGenerator {
                     type #type_alias = #argument_type;
                 )*
                 #(
-                    let mut #rust_argument_name: #constructor_name = #constructor_name::from_mrb(mrb, &#mrb_argument_name);
+                    let #rust_argument_name = #constructor_name::try_from_mrb(MrbValue::new(mrb, #mrb_argument_name));
+                    let mut #rust_argument_name: #constructor_name = match #rust_argument_name {
+                        Ok(val) => val,
+                        Err(error) => {
+                            ::minutus::mruby::raise_type_mismatch_argument_error(
+                                mrb,
+                                #mrb_argument_name,
+                                #argument_type_name.to_string(),
+                                error.msg.clone()
+                            )
+                        }
+                    };
                 )*
 
-                #function_call(#(#rust_argument_name),*).into_mrb(mrb)
+                #function_call(#(#rust_argument_name),*).try_into_mrb(mrb).unwrap().val
             }
         }
     }

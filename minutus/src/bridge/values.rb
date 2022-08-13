@@ -1,13 +1,13 @@
 require 'erb'
 
-into_mrb = %w[
+ts = %w[
   false
   nil
   true
 ]
 
 value_c = ERB.new(<<~TEMPLATE).result
-<% into_mrb.each do |type| %>
+<% ts.each do |type| %>
 minu_value minu_<%= type %>_value()
 {
   return mrb_<%= type %>_value();

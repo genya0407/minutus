@@ -14,7 +14,7 @@ pub mod types;
 /// }
 ///
 /// fn main() {
-///     let runtime = minutus::build_simple_evaluator();
+///     let runtime = minutus::Evaluator::build();
 ///     let mruby_array: minutus::types::MrbValue = runtime.evaluate("['aaa', 'bbb']").unwrap();
 ///     assert_eq!("[\"aaa\", \"bbb\"]", mruby_array.inspect());
 ///     assert_eq!(vec![String::from("aaa"), String::from("bbb"), String::from("ccc")], mruby_array.concat(vec!["ccc"]));
@@ -54,11 +54,12 @@ pub use minutus_macros::define_funcall;
 /// }
 ///
 /// fn main() {
-///     use minutus::types::FromMrb; // for using `Point::from_mrb`
+///     use minutus::types::TryFromMrb; // for using `Point::try_from_mrb`
 ///
-///     let runtime = minutus::Evaluator::build(Point::define_class_on_mrb, Point::from_mrb);
+///     let runtime = minutus::Evaluator::build();
+///     Point::define_class_on_mrb(runtime.mrb());
 ///
-///     let point = runtime.evaluate("Point.new(1,2)").unwrap();
+///     let point = Point::try_from_mrb(runtime.evaluate("Point.new(1,2)").unwrap()).unwrap();
 ///     // evaluates `point.inspect` in mruby world, and returns its value
 ///     point.inspect(); // => "#<Point:0x140009fb0>"
 ///
@@ -98,9 +99,9 @@ pub use minutus_macros::extern_methods;
 /// }
 ///
 /// fn main() {
-///     use minutus::types::FromMrb; // for using `Point::from_mrb`
+///     use minutus::types::TryFromMrb; // for using `Point::try_from_mrb`
 ///
-///     let runtime = minutus::build_simple_evaluator();
+///     let runtime = minutus::Evaluator::build();
 ///
 ///     // register class in mruby
 ///     Point::define_class_on_mrb(runtime.mrb());
@@ -120,7 +121,6 @@ pub use minutus_macros::wrap;
 pub use minutus_macros::{class_method, method, MrbData};
 
 mod evaluator;
-mod utils;
 pub use evaluator::*;
 pub mod mruby;
 

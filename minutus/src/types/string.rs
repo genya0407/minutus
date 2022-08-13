@@ -1,34 +1,34 @@
 use super::*;
 
-impl FromMrb<Self> for String {
-    fn from_mrb(mrb: *mut minu_state, value: &minu_value) -> Self {
+impl TryFromMrb for String {
+    fn try_from_mrb(value: MrbValue) -> MrbResult<Self> {
         unsafe {
-            if minu_string_p(*value) {
-                let cstr = std::ffi::CStr::from_ptr(minu_str_to_cstr(mrb, *value));
-                return cstr.to_string_lossy().into_owned();
+            if minu_string_p(value.val) {
+                let cstr = std::ffi::CStr::from_ptr(minu_str_to_cstr(value.mrb, value.val));
+                Ok(cstr.to_string_lossy().into_owned())
             } else {
-                crate::utils::raise_type_mismatch_argument_error(mrb, *value, "String")
+                Err(MrbConversionError::new("String"))
             }
         }
     }
 }
 
-impl IntoMrb for String {
-    fn into_mrb(self, mrb: *mut minu_state) -> minu_value {
+impl TryIntoMrb for String {
+    fn try_into_mrb(self, mrb: *mut minu_state) -> MrbResult<MrbValue> {
         let cstr = std::ffi::CString::new(self).unwrap();
-        unsafe { minu_str_new_cstr(mrb, cstr.as_ptr()) }
+        unsafe { Ok(MrbValue::new(mrb, minu_str_new_cstr(mrb, cstr.as_ptr()))) }
     }
 }
 
-impl IntoMrb for &str {
-    fn into_mrb(self, mrb: *mut minu_state) -> minu_value {
+impl TryIntoMrb for &str {
+    fn try_into_mrb(self, mrb: *mut minu_state) -> MrbResult<MrbValue> {
         let cstr = std::ffi::CString::new(self).unwrap();
-        unsafe { minu_str_new_cstr(mrb, cstr.as_ptr()) }
+        unsafe { Ok(MrbValue::new(mrb, minu_str_new_cstr(mrb, cstr.as_ptr()))) }
     }
 }
 
-// impl FromMrb<Self> for Vec<u8> {
-//     fn from_mrb(mrb: *mut minu_state, value: &minu_value) -> Self {
+// impl TryFromMrb for Vec<u8> {
+//     fn try_from_mrb(mrb: *mut minu_state, value: &minu_value) -> Self {
 //         unsafe {
 //             if minu_string_p(*value) {
 //                 let cstr = std::ffi::CStr::from_ptr(minu_str_to_cstr(mrb, *value));
@@ -40,8 +40,8 @@ impl IntoMrb for &str {
 //     }
 // }
 
-// impl IntoMrb for Vec<u8> {
-//     fn into_mrb(self, mrb: *mut minu_state) -> minu_value {
+// impl TryIntoMrb for Vec<u8> {
+//     fn try_into_mrb(self, mrb: *mut minu_state) -> minu_value {
 //         unsafe {
 //             minu_str_new(
 //                 mrb,

@@ -1,24 +1,24 @@
 use super::*;
 
-impl<T: FromMrb<T>> FromMrb<Self> for Option<T> {
-    fn from_mrb(mrb: *mut minu_state, value: &minu_value) -> Self {
+impl<T: TryFromMrb> TryFromMrb for Option<T> {
+    fn try_from_mrb(value: MrbValue) -> MrbResult<Self> {
         unsafe {
-            if minu_nil_p(*value) {
-                return None;
+            if minu_nil_p(value.val) {
+                return Ok(None);
             } else {
-                Some(T::from_mrb(mrb, value))
+                Ok(Some(T::try_from_mrb(value)?))
             }
         }
     }
 }
 
-impl<T: IntoMrb> IntoMrb for Option<T> {
-    fn into_mrb(self, mrb: *mut minu_state) -> minu_value {
+impl<T: TryIntoMrb> TryIntoMrb for Option<T> {
+    fn try_into_mrb(self, mrb: *mut minu_state) -> MrbResult<MrbValue> {
         unsafe {
             if let Some(v) = self {
-                v.into_mrb(mrb)
+                v.try_into_mrb(mrb)
             } else {
-                minu_nil_value()
+                Ok(MrbValue::new(mrb, minu_nil_value()))
             }
         }
     }

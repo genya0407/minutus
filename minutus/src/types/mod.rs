@@ -29,17 +29,69 @@ mod r_symbol;
 mod string;
 mod tuples;
 mod unit;
-mod values;
 
 pub use r_symbol::*;
-pub use values::*;
+
+pub type MrbResult<T> = Result<T, MrbConversionError>;
 
 /// Trait that handles casting Rust value into mruby value.
-pub trait IntoMrb {
-    fn into_mrb(self, mrb: *mut minu_state) -> minu_value;
+pub trait TryIntoMrb {
+    fn try_into_mrb(self, mrb: *mut minu_state) -> MrbResult<MrbValue>;
 }
 
 /// Trait that handles casting mruby value into Rust value.
-pub trait FromMrb<Target> {
-    fn from_mrb(mrb: *mut minu_state, value: &minu_value) -> Target;
+pub trait TryFromMrb<Target = Self>: Sized {
+    fn try_from_mrb(value: MrbValue) -> MrbResult<Target>;
+}
+
+/// Represents values returned from mruby world.
+///
+/// Using `minutus::define_funcall` macro, you can define arbitrary methods to this type.
+#[derive(Clone, Debug)]
+pub struct MrbValue {
+    pub mrb: *mut minu_state,
+    pub val: minu_value,
+}
+
+impl MrbValue {
+    pub fn new(mrb: *mut minu_state, val: minu_value) -> Self {
+        Self { mrb, val }
+    }
+}
+
+impl TryIntoMrb for MrbValue {
+    fn try_into_mrb(self, _mrb: *mut minu_state) -> MrbResult<MrbValue> {
+        Ok(self)
+    }
+}
+
+impl TryFromMrb for MrbValue {
+    fn try_from_mrb(value: MrbValue) -> MrbResult<Self> {
+        Ok(value)
+    }
+}
+
+impl std::fmt::Display for MrbConversionError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.msg)
+    }
+}
+
+impl std::error::Error for MrbConversionError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        None
+    }
+}
+
+#[derive(Debug)]
+pub struct MrbConversionError {
+    pub msg: String,
+}
+
+impl MrbConversionError {
+    pub fn new(ty: &str) -> Self {
+        Self {
+            msg: format!("Could not convert into {}", ty),
+        }
+    }
 }
