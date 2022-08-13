@@ -27,20 +27,8 @@ jobs:
           override: true
       - run: cargo test -vv --features mruby_${{ matrix.mruby_version }}
 
-  mrbgem_template_test:
-    name: mrbgem-template test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.1'
-      - uses: Swatinem/rust-cache@v2
-      - run: cd minutus-mrbgem-template && ./test.sh
-      - run: cd minutus-mrbgem-template && ./test_with_dependency.sh
-
-  examples_test:
-    name: examples test
+  integration_test:
+    name: run all integration tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -51,4 +39,4 @@ jobs:
         with:
           toolchain: stable
           override: true
-      - run: cd examples && rake run_all
+      - run: CLEAN=true rake run_all
