@@ -1,6 +1,7 @@
 # Minutus
 
 [![minutus](https://img.shields.io/crates/v/minutus.svg)](https://crates.io/crates/minutus)
+[![docs.rs](https://img.shields.io/badge/docs.rs-minutus-blue)](https://docs.rs/minutus)
 ![ci status](https://github.com/genya0407/minutus/actions/workflows/test.yml/badge.svg)
 ![license](https://img.shields.io/github/license/genya0407/minutus)
 

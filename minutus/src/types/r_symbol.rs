@@ -1,15 +1,17 @@
 use super::*;
 
-pub trait StrToSym {
+/// Extension trait that defines `to_sym` method.
+pub trait ToSymbol {
     fn to_sym(&self, mrb: *mut minu_state) -> RSymbol;
 }
 
-impl StrToSym for &str {
+impl ToSymbol for &str {
     fn to_sym(&self, mrb: *mut minu_state) -> RSymbol {
         RSymbol::new(mrb, self)
     }
 }
 
+/// Represents mruby's symbol.
 #[derive(Clone, Debug, Hash, PartialEq, Eq)]
 pub struct RSymbol {
     mid: minu_sym,

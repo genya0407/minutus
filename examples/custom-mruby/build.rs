@@ -6,10 +6,7 @@ fn main() {
     let out_dir = std::env::var("OUT_DIR").unwrap();
     let out_dir = Path::new(&out_dir);
 
-    let builder = minutus::MRubyBuilder {
-        base_dir: &out_dir,
-        mruby_version: String::from("3.1.0"),
-    };
+    let builder = minutus::MRubyBuilder::new(&out_dir, String::from("3.1.0"));
     builder.download_mruby().unwrap();
     builder
         .link_mruby_with_build_config(&std::env::current_dir().unwrap().join("build_config.rb"))

@@ -23,26 +23,31 @@ pub fn generate_methods(input: TokenStream) -> TokenStream {
           };
           let argc = argument_name.len();
 
-          let (slf, slf_value): (proc_macro2::TokenStream, proc_macro2::TokenStream) =
+          let (slf, slf_value, mrb_definition) =
               if method_signature.has_self {
-                  (quote! { &self, }, quote! {self.minu_value.clone()})
+                  (
+                    quote! { &self },
+                    quote! { self.minu_value() },
+                    quote! { let mrb = self.mrb() }
+                  )
               } else {
                   (
-                      quote! {},
+                      quote! { mrb: *mut ::minutus::mruby::minu_state },
                       quote! { ::minutus::mruby::minu_obj_value(<#target_type>::minu_class(mrb) as _) },
+                      quote! {  }
                   )
               };
 
           let method_sig = quote! {
               fn #method_name(
-                  #slf mrb: *mut ::minutus::mruby::minu_state
+                  #slf
                   #(,#argument_name:#argument_type)*
               ) #return_signature;
           };
 
           let method_body = quote! {
               fn #method_name(
-                  #slf mrb: *mut ::minutus::mruby::minu_state
+                  #slf
                   #(,#argument_name:#argument_type)*
               ) #return_signature {
                   use ::minutus::types::*;
@@ -52,6 +57,7 @@ pub fn generate_methods(input: TokenStream) -> TokenStream {
                   let mrb_method_name = #mrb_method_name;
                   let mrb_method_name_cstr = std::ffi::CString::new(mrb_method_name).unwrap();
                   unsafe {
+                      #mrb_definition;
                       #(
                           let #argument_name = #argument_name.into_mrb(mrb);
                       )*
@@ -87,7 +93,7 @@ pub fn generate_methods(input: TokenStream) -> TokenStream {
             #(#instance_method_sig)*
         }
 
-        impl #instance_trait_name for ::minutus::data::DerefPtr<#target_type> {
+        impl #instance_trait_name for ::minutus::data::DataPtr<#target_type> {
             #(#instance_method_body)*
         }
 

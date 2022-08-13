@@ -5,6 +5,7 @@ edition = "2021"
 license = "MIT"
 authors = ["Yusuke Sangenya <longinus.eva@gmail.com>"]
 description = "Procedural macro definitions for minutus"
+repository = "https://github.com/genya0407/minutus"
 
 [dependencies]
 darling = "0.14.1"

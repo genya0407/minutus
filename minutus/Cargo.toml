@@ -5,6 +5,9 @@ edition = "2021"
 license = "MIT"
 authors = ["Yusuke Sangenya <longinus.eva@gmail.com>"]
 description = "mruby bridge for Rust"
+repository = "https://github.com/genya0407/minutus"
+keywords = ["mruby", "ruby"]
+categories = ["api-bindings", "development-tools::ffi"]
 
 [build-dependencies]
 minutus-mruby-build-utils = { version = "0.2", path = "../minutus-mruby-build-utils" }

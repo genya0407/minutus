@@ -16,16 +16,27 @@ fn run_command(current_dir: &Path, cmd: &[&str]) -> Result<String> {
     }
 }
 
+/// Helper for building and linking libmruby.
 pub struct MRubyBuilder<'a> {
-    pub base_dir: &'a Path,
-    pub mruby_version: String,
+    base_dir: &'a Path,
+    mruby_version: String,
 }
 
 impl<'a> MRubyBuilder<'a> {
+    /// `base_dir` should be `OUT_DIR` environment variable.
+    pub fn new(base_dir: &'a Path, mruby_version: String) -> Self {
+        Self {
+            base_dir,
+            mruby_version,
+        }
+    }
+
+    /// Builds and links `libmruby.a` with default `build_config.rb`.
     pub fn link_mruby(&self) -> Result<()> {
         self.internal_link_mruby(None)
     }
 
+    /// Builds and links `libmruby.a` with custom `build_config.rb`.
     pub fn link_mruby_with_build_config(&self, build_config_path: &Path) -> Result<()> {
         self.internal_link_mruby(Some(build_config_path))
     }
@@ -69,6 +80,7 @@ impl<'a> MRubyBuilder<'a> {
         Ok(())
     }
 
+    /// Downloads mruby source code from github.
     pub fn download_mruby(&self) -> Result<()> {
         if self.base_dir.join("mruby").exists() {
             return Ok(());

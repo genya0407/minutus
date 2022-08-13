@@ -25,10 +25,7 @@ fn main() -> Result<()> {
     let out_dir_str = env::var("OUT_DIR")?;
     let base_dir = Path::new(&out_dir_str);
 
-    let builder = MRubyBuilder {
-        base_dir: base_dir,
-        mruby_version: mruby_version(),
-    };
+    let builder = MRubyBuilder::new(base_dir, mruby_version());
 
     builder.download_mruby()?;
     compile_bridge(&base_dir)?;
