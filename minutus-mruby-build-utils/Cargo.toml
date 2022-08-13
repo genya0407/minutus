@@ -5,6 +5,7 @@ edition = "2021"
 license = "MIT"
 authors = ["Yusuke Sangenya <longinus.eva@gmail.com>"]
 description = "Build utilities for minutus"
+repository = "https://github.com/genya0407/minutus"
 
 [dependencies]
 anyhow = "1.0.60"

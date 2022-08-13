@@ -5,6 +5,9 @@ edition = "2021"
 license = "MIT"
 authors = ["Yusuke Sangenya <longinus.eva@gmail.com>"]
 description = "mrbgem generator integrated with minutus"
+repository = "https://github.com/genya0407/minutus"
+keywords = ["cli", "mruby", "ruby"]
+categories = ["command-line-utilities"]
 
 [build-dependencies]
 minutus = { version = "0.2", path = "../minutus", features = ["mruby_3_1_0"] }
