@@ -22,6 +22,13 @@ pub struct MRubyBuilder<'a> {
 }
 
 impl<'a> MRubyBuilder<'a> {
+    pub fn new(base_dir: &'a Path, mruby_version: String) -> Self {
+        Self {
+            base_dir,
+            mruby_version,
+        }
+    }
+
     pub fn link_mruby(&self) -> Result<()> {
         self.internal_link_mruby(None)
     }
