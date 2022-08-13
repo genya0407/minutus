@@ -124,4 +124,4 @@ mod utils;
 pub use evaluator::*;
 pub mod mruby;
 
-pub use minutus_mruby_build_utils::MRubyBuilder;
+pub use minutus_mruby_build_utils::MRubyManager;
