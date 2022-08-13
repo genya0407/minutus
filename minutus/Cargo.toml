@@ -1,6 +1,6 @@
 [package]
 name = "minutus"
-version = "0.3.1"
+version = "0.3.2-alpha.0"
 edition = "2021"
 license = "MIT"
 authors = ["Yusuke Sangenya <longinus.eva@gmail.com>"]
