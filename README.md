@@ -7,9 +7,12 @@
 
 Heavily inspired by [Magnus](https://github.com/matsadler/magnus).
 
-By minutus, you can easily [embed mruby in Rust](#embed-mruby-in-rust), and [create mrbgem by Rust](#create-mrbgem-by-rust).
+By minutus, you can easily [embed mruby in Rust](#embed-mruby-in-rust),
+and [create mrbgem by Rust](#create-mrbgem-by-rust).
 
-Minutus also provides sensible [type casting](#type-casting), and you can [define typed functions to mruby values](#define-typed-functions-to-mruby-values) and [wrap rust structs in mruby objects](#wrap-rust-structs-in-mruby-objects).
+Minutus also provides sensible [type casting](#type-casting),
+and you can [define typed functions to mruby values](#define-typed-functions-to-mruby-values)
+and [wrap rust structs in mruby objects](#wrap-rust-structs-in-mruby-objects).
 
 ## Embed mruby in Rust
 
@@ -61,7 +64,8 @@ $ cargo run
 retval is 10
 ```
 
-If you want to use custom `build_config.rb` (e.g. for using mrbgems), you have to write custom `build_config.rb` and `build.rs`
+If you want to use custom `build_config.rb` (e.g. for using mrbgems),
+you have to write custom `build.rs`
 
 Minutus provides a helper for this purpose. See [examples/custom-mruby](/examples/custom-mruby).
 
@@ -108,7 +112,8 @@ Warning: 0
 
 You can wrap Rust's struct in mruby objects.
 
-The following example defines `TestMrbgem` class in mruby, which has class method `new`, and instance methods `distance` and `name_with_prefix`.
+The following example defines `TestMrbgem` class in mruby,
+which has class method `new`, and instance methods `distance` and `name_with_prefix`.
 
 ```rust
 #[minutus::wrap(class_method = "new", method = "distance", method = "name_with_prefix")]
