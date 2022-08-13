@@ -2,7 +2,7 @@ use anyhow::{anyhow, Result};
 use std::env;
 use std::path::Path;
 
-use minutus_mruby_build_utils::MRubyBuilder;
+use minutus_mruby_build_utils::MRubyManager;
 
 fn check_command(cmd: &[&str]) {
     if std::process::Command::new(cmd[0])
@@ -22,17 +22,12 @@ fn main() -> Result<()> {
     println!("cargo:rerun-if-changed=src/bridge");
     println!("cargo:rerun-if-changed=build.rs");
 
-    let out_dir_str = env::var("OUT_DIR")?;
-    let base_dir = Path::new(&out_dir_str);
-
-    let builder = MRubyBuilder::new(base_dir, mruby_version());
-
-    builder.download_mruby()?;
-    compile_bridge(&base_dir)?;
-
-    if env::var("CARGO_FEATURE_LINK_MRUBY").is_ok() {
-        builder.link_mruby()?
-    }
+    let do_link = env::var("CARGO_FEATURE_LINK_MRUBY").is_ok();
+    MRubyManager::new()
+        .mruby_version(&mruby_version())
+        .link(do_link)
+        .run();
+    compile_bridge()?;
 
     println!("Finish build.rs");
 
@@ -55,7 +50,9 @@ fn mruby_version() -> String {
     return default.to_string();
 }
 
-fn compile_bridge(out_dir: &Path) -> Result<()> {
+fn compile_bridge() -> Result<()> {
+    let out_dir = std::env::var("OUT_DIR")?;
+    let out_dir = Path::new(&out_dir);
     // generate bridge.c
     let output = std::process::Command::new("ruby")
         .args(&["all.rb"])
