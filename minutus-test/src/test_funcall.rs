@@ -36,8 +36,9 @@ use minutus::Evaluator;
 
 #[test]
 pub fn test_funcall() {
-    let runtime = Evaluator::build(Point::define_class_on_mrb, Point::from_mrb);
-    let point = runtime.evaluate("Point.new(1,2,'test')").unwrap();
+    let runtime = Evaluator::build();
+    Point::define_class_on_mrb(runtime.mrb());
+    let point = Point::try_from_mrb(runtime.evaluate("Point.new(1,2,'test')").unwrap()).unwrap();
     assert_regex_match(r"#<Point:0x[0-9a-f]+>", &point.inspect_2());
     assert_regex_match(r"#<Point:0x[0-9a-f]+>", &point.to_s());
     assert_regex_match(
@@ -59,7 +60,7 @@ minutus::define_funcall! {
 
 #[test]
 pub fn test_define_funcall() {
-    let runtime = minutus::build_simple_evaluator();
+    let runtime = minutus::Evaluator::build();
     let retval = runtime.evaluate("123").unwrap();
     let inspected = retval.inspect();
     println!("{}", inspected);

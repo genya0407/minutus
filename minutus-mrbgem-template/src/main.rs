@@ -1,16 +1,16 @@
 use anyhow::{anyhow, Result};
 use convert_case::{Case, Casing};
 use maplit::hashmap;
-use minutus::build_simple_evaluator;
 use minutus::mruby::*;
 use minutus::types::*;
+use minutus::Evaluator;
 use std::collections::HashMap;
 use std::env::current_dir;
 use std::io::prelude::*;
 use std::path::Path;
 
 minutus::define_funcall!(
-    fn new(&self, params: HashMap<RSymbol, minu_value>) -> MrbValue;
+    fn new(&self, params: HashMap<RSymbol, MrbValue>) -> MrbValue;
     fn create(&self);
 );
 
@@ -156,7 +156,7 @@ fn initialize_by_mrbgem_template(
     bin_name: Option<String>,
     mrbgem_name: String,
 ) -> Result<()> {
-    let runtime = build_simple_evaluator();
+    let runtime = Evaluator::build();
 
     // for convenience
     let mrb = runtime.mrb();
@@ -169,18 +169,18 @@ fn initialize_by_mrbgem_template(
     let mrbgem_template = runtime.evaluate("MrbgemTemplate").map_err(|e| anyhow!(e))?;
     let class_name = class_name.unwrap_or_else(|| parse_class_name(mrbgem_name.clone()));
     let c = mrbgem_template.new(hashmap! {
-        "license".to_sym(mrb) => license.into_mrb(mrb),
-        "github_user".to_sym(mrb) => github_user.unwrap_or_else(detect_github_user).into_mrb(mrb),
-        "mrbgem_name".to_sym(mrb) => mrbgem_name.clone().into_mrb(mrb),
-        "mrbgem_prefix".to_sym(mrb) => ".".into_mrb(mrb),
-        "class_name".to_sym(mrb) => class_name.into_mrb(mrb),
-        "author".to_sym(mrb) => author.unwrap_or_else(detect_author).into_mrb(mrb),
-        "mruby_version".to_sym(mrb) => mruby_version.into_mrb(mrb),
-        "ci".to_sym(mrb) => unsafe { minu_true_value() },
-        "local_builder".to_sym(mrb) => unsafe { minu_true_value() },
+        "license".to_sym(mrb) => license.try_into_mrb(mrb)?,
+        "github_user".to_sym(mrb) => github_user.unwrap_or_else(detect_github_user).try_into_mrb(mrb)?,
+        "mrbgem_name".to_sym(mrb) => mrbgem_name.clone().try_into_mrb(mrb)?,
+        "mrbgem_prefix".to_sym(mrb) => ".".try_into_mrb(mrb)?,
+        "class_name".to_sym(mrb) => class_name.try_into_mrb(mrb)?,
+        "author".to_sym(mrb) => author.unwrap_or_else(detect_author).try_into_mrb(mrb)?,
+        "mruby_version".to_sym(mrb) => mruby_version.try_into_mrb(mrb)?,
+        "ci".to_sym(mrb) => unsafe { MrbValue::new(mrb, minu_true_value()) },
+        "local_builder".to_sym(mrb) => unsafe { MrbValue::new(mrb, minu_true_value()) },
         "bin_name".to_sym(mrb) => match bin_name {
-            Some(v) => v.into_mrb(mrb),
-            None => unsafe  { minu_nil_value() },
+            Some(v) => v.try_into_mrb(mrb)?,
+            None => unsafe  { MrbValue::new(mrb, minu_nil_value()) },
         }
     });
     c.create();

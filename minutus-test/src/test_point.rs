@@ -1,3 +1,5 @@
+use minutus::types::TryFromMrb;
+
 use crate::test_utils::Executor;
 
 #[minutus::wrap(class_method = "new", method = "distance", method = "name_with_prefix")]
@@ -64,4 +66,14 @@ fn test_distance() {
             assert_eq(distance, Math.sqrt(2))
             ",
     )
+}
+
+#[test]
+fn test_get_value_from_mruby() {
+    let evaluator = minutus::Evaluator::build();
+    Point::define_class_on_mrb(evaluator.mrb());
+
+    let point =
+        Point::try_from_mrb(evaluator.evaluate("Point.new(1, 2, 'hoge')").unwrap()).unwrap();
+    assert_eq!("hogee_hoge", point.name_with_prefix("hogee".to_string()));
 }

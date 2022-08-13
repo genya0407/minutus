@@ -33,7 +33,7 @@ minutus::define_funcall!{
 }
 
 fn main() {
-    let runtime = minutus::build_simple_evaluator();
+    let runtime = minutus::Evaluator::build();
 
     // define `some_method` in mruby world
     runtime.evaluate(
@@ -152,7 +152,7 @@ minutus::define_funcall! {
 }
 
 fn main() {
-    let runtime = minutus::build_simple_evaluator();
+    let runtime = minutus::Evaluator::build();
 
     let mruby_array = runtime.evaluate("['aaa', 'bbb']").unwrap();
     assert_eq!("[\"aaa\", \"bbb\"]", mruby_array.inspect());
