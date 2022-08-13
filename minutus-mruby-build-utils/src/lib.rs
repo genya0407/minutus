@@ -17,8 +17,8 @@ fn run_command(current_dir: &Path, cmd: &[&str]) -> Result<String> {
 }
 
 pub struct MRubyBuilder<'a> {
-    pub base_dir: &'a Path,
-    pub mruby_version: String,
+    base_dir: &'a Path,
+    mruby_version: String,
 }
 
 impl<'a> MRubyBuilder<'a> {
