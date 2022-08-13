@@ -1,10 +1,10 @@
 use super::*;
 
-pub trait StrToSym {
+pub trait ToSymbol {
     fn to_sym(&self, mrb: *mut minu_state) -> RSymbol;
 }
 
-impl StrToSym for &str {
+impl ToSymbol for &str {
     fn to_sym(&self, mrb: *mut minu_state) -> RSymbol {
         RSymbol::new(mrb, self)
     }
