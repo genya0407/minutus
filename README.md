@@ -154,7 +154,7 @@ minutus::define_funcall! {
 fn main() {
     let runtime = minutus::build_simple_evaluator();
 
-    let mruby_array: minutus::types::MinuValue = runtime.evaluate("['aaa', 'bbb']").unwrap();
+    let mruby_array = runtime.evaluate("['aaa', 'bbb']").unwrap();
     assert_eq!("[\"aaa\", \"bbb\"]", mruby_array.inspect());
     assert_eq!(vec![String::from("aaa"), String::from("bbb"), String::from("ccc")], mruby_array.concat(vec!["ccc"]));
 ```

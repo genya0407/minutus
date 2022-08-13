@@ -54,7 +54,7 @@ fn assert_regex_match(pat: &str, val: &str) {
 
 minutus::define_funcall! {
     fn inspect(self) -> String;
-    fn inspect_2(self) -> MinuValue => "to_s";
+    fn inspect_2(self) -> MrbValue => "to_s";
 }
 
 #[test]

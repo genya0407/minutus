@@ -16,18 +16,18 @@ impl FromMrb<minu_value> for minu_value {
 ///
 /// Using `minutus::define_funcall` macro, you can define arbitrary methods to this type.
 #[derive(Clone, Debug)]
-pub struct MinuValue {
+pub struct MrbValue {
     pub mrb: *mut minu_state,
     pub val: minu_value,
 }
 
-impl IntoMrb for MinuValue {
+impl IntoMrb for MrbValue {
     fn into_mrb(self, _mrb: *mut minu_state) -> minu_value {
         self.val
     }
 }
 
-impl FromMrb<MinuValue> for MinuValue {
+impl FromMrb<MrbValue> for MrbValue {
     fn from_mrb(mrb: *mut minu_state, val: &minu_value) -> Self {
         Self { mrb, val: *val }
     }

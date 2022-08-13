@@ -4,8 +4,8 @@ use crate::types::*;
 /// Builds [`Evaluator`].
 ///
 /// If you need more customizable [`Evaluator`], see [`Evaluator::build()`]
-pub fn build_simple_evaluator() -> Evaluator<MinuValue> {
-    Evaluator::<MinuValue>::build(|_| {}, MinuValue::from_mrb)
+pub fn build_simple_evaluator() -> Evaluator<MrbValue> {
+    Evaluator::<MrbValue>::build(|_| {}, MrbValue::from_mrb)
 }
 
 /// Evaluates mruby code, and holds `mrb`.
@@ -24,7 +24,7 @@ pub fn build_simple_evaluator() -> Evaluator<MinuValue> {
 ///
 /// fn main() {
 ///     let runtime = minutus::build_simple_evaluator();
-///     // prints [1,2,3] and returns `MinuValue` which holds `[1,2,3]`
+///     // prints [1,2,3] and returns `MrbValue` which holds `[1,2,3]`
 ///     let array = runtime.evaluate("p [1,2,3]").unwrap();
 ///     // `concat` returns Vec<i64> because of the `define_funcall` definition.
 ///     let concat_array = array.concat(vec![4,5,6]);
@@ -84,7 +84,7 @@ impl<EvaluationResult> Evaluator<EvaluationResult> {
     /// Evaluates `script` in mruby world, and type-cast its return value.
     ///
     /// - `EvaluationResult` is determined by `from_mrb` function passed to `build`.
-    ///   - If you use `build_simple_evaluator`, `EvaluationResult` is `MinuValue`.
+    ///   - If you use `build_simple_evaluator`, `EvaluationResult` is `MrbValue`.
     /// - When an error is raised in `script`, it returns `Err(msg)`.
     pub fn evaluate(&self, script: &str) -> Result<EvaluationResult, String> {
         use crate::types::*;

@@ -3,7 +3,7 @@
 pub mod data;
 pub mod types;
 
-/// Define methods for [MinuValue][`types::MinuValue`].
+/// Define methods for [MrbValue][`types::MrbValue`].
 ///
 /// # Examples
 ///
@@ -15,7 +15,7 @@ pub mod types;
 ///
 /// fn main() {
 ///     let runtime = minutus::build_simple_evaluator();
-///     let mruby_array: minutus::types::MinuValue = runtime.evaluate("['aaa', 'bbb']").unwrap();
+///     let mruby_array: minutus::types::MrbValue = runtime.evaluate("['aaa', 'bbb']").unwrap();
 ///     assert_eq!("[\"aaa\", \"bbb\"]", mruby_array.inspect());
 ///     assert_eq!(vec![String::from("aaa"), String::from("bbb"), String::from("ccc")], mruby_array.concat(vec!["ccc"]));
 /// }

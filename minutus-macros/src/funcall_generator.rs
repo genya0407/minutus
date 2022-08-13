@@ -257,7 +257,7 @@ pub fn define_funcall(input: TokenStream) -> TokenStream {
             #(#method_sig)*
         }
 
-        impl #trait_name for ::minutus::types::MinuValue {
+        impl #trait_name for ::minutus::types::MrbValue {
             #(#method_body)*
         }
     }

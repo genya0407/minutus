@@ -10,7 +10,7 @@ use std::io::prelude::*;
 use std::path::Path;
 
 minutus::define_funcall!(
-    fn new(&self, params: HashMap<RSymbol, minu_value>) -> MinuValue;
+    fn new(&self, params: HashMap<RSymbol, minu_value>) -> MrbValue;
     fn create(&self);
 );
 
