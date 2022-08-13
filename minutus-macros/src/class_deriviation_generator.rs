@@ -47,8 +47,8 @@ pub fn derive_data(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
             }
         }
 
-        impl ::minutus::types::FromMrb<::minutus::data::DerefPtr<#ident>> for #ident {
-            fn from_mrb<'a>(mrb: *mut ::minutus::mruby::minu_state, value: &::minutus::mruby::minu_value) -> ::minutus::data::DerefPtr<#ident> {
+        impl ::minutus::types::FromMrb<::minutus::data::DataPtr<#ident>> for #ident {
+            fn from_mrb<'a>(mrb: *mut ::minutus::mruby::minu_state, value: &::minutus::mruby::minu_value) -> ::minutus::data::DataPtr<#ident> {
                 use minutus::data::MrbData;
 
                 #ident::from_mrb_data(mrb, value)

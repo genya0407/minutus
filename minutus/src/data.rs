@@ -2,12 +2,12 @@ use crate::{mruby::*, types::FromMrb};
 
 // TODO: mrb_gc_register / mrb_gc_unregister を使ってちゃんとGCと向き合う
 // new 関数を作って register, drop するときに unregister すれば大丈夫な気がする
-pub struct DerefPtr<T: Sized> {
+pub struct DataPtr<T: Sized> {
     rusty_value_ptr: *mut T,
     pub minu_value: minu_value,
 }
 
-impl<T> std::ops::Deref for DerefPtr<T> {
+impl<T> std::ops::Deref for DataPtr<T> {
     type Target = T;
 
     fn deref(&self) -> &Self::Target {
@@ -15,16 +15,16 @@ impl<T> std::ops::Deref for DerefPtr<T> {
     }
 }
 
-impl<T: MrbData> FromMrb<DerefPtr<T>> for DerefPtr<T> {
-    fn from_mrb(mrb: *mut minu_state, value: &minu_value) -> DerefPtr<T> {
+impl<T: MrbData> FromMrb<DataPtr<T>> for DataPtr<T> {
+    fn from_mrb(mrb: *mut minu_state, value: &minu_value) -> DataPtr<T> {
         T::from_mrb_data(mrb, value)
     }
 }
 
 pub trait MrbData: Sized {
-    fn from_mrb_data<'a>(mrb: *mut minu_state, value: &minu_value) -> DerefPtr<Self> {
+    fn from_mrb_data<'a>(mrb: *mut minu_state, value: &minu_value) -> DataPtr<Self> {
         unsafe {
-            DerefPtr {
+            DataPtr {
                 rusty_value_ptr: minu_data_get_ptr(mrb, *value, Self::minu_data_type())
                     as *mut Self,
                 minu_value: (*value).clone(),

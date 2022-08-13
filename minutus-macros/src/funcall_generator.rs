@@ -87,7 +87,7 @@ pub fn generate_methods(input: TokenStream) -> TokenStream {
             #(#instance_method_sig)*
         }
 
-        impl #instance_trait_name for ::minutus::data::DerefPtr<#target_type> {
+        impl #instance_trait_name for ::minutus::data::DataPtr<#target_type> {
             #(#instance_method_body)*
         }
 

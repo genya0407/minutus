@@ -25,7 +25,7 @@ impl Point {
 minutus::extern_methods! {
     Point;
     fn name() -> String;
-    fn new_2(x: i64, y: i64, name: String) -> ::minutus::data::DerefPtr<Point> => "new";
+    fn new_2(x: i64, y: i64, name: String) -> ::minutus::data::DataPtr<Point> => "new";
     fn inspect_2(self) -> String => "inspect";
     fn to_s(self) -> String;
     fn name_with_prefix_2(self, prefix: String) -> String => "name_with_prefix";
