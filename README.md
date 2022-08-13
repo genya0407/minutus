@@ -157,6 +157,7 @@ fn main() {
     let mruby_array = runtime.evaluate("['aaa', 'bbb']").unwrap();
     assert_eq!("[\"aaa\", \"bbb\"]", mruby_array.inspect());
     assert_eq!(vec![String::from("aaa"), String::from("bbb"), String::from("ccc")], mruby_array.concat(vec!["ccc"]));
+}
 ```
 
 ## Type casting
