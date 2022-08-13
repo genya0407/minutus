@@ -12,6 +12,9 @@ impl FromMrb<minu_value> for minu_value {
     }
 }
 
+/// Represents values returned from mruby world.
+///
+/// Using `minutus::define_funcall` macro, you can define arbitrary methods to this type.
 #[derive(Clone, Debug)]
 pub struct MinuValue {
     pub mrb: *mut minu_state,

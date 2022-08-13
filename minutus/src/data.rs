@@ -1,7 +1,10 @@
+//! Bindings between Rust's struct and mruby's [RData](https://mruby.org/docs/api/headers/mruby_2Fdata.h.html)
+//!
+//! See also [wrap](../attr.wrap.html)
+
 use crate::{mruby::*, types::FromMrb};
 
-// TODO: mrb_gc_register / mrb_gc_unregister を使ってちゃんとGCと向き合う
-// new 関数を作って register, drop するときに unregister すれば大丈夫な気がする
+/// Container type for MrbData
 pub struct DataPtr<T: Sized> {
     rusty_value_ptr: *mut T,
     minu_value: minu_value,
@@ -32,6 +35,9 @@ impl<T: MrbData> FromMrb<DataPtr<T>> for DataPtr<T> {
     }
 }
 
+/// Trait that handles type-casting between Rust's data and mruby's [RData](https://mruby.org/docs/api/headers/mruby_2Fdata.h.html).
+///
+/// This trait is implemented by `minutus::wrap` macro.
 pub trait MrbData: Sized {
     fn from_mrb_data<'a>(mrb: *mut minu_state, value: &minu_value) -> DataPtr<Self> {
         unsafe {

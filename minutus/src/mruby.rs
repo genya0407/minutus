@@ -1,3 +1,9 @@
+//! Low-level interface to mruby C API.
+//!
+//! Most functions/types are almost identical to the original mruby C API. Only difference is their prefix (`minu_` instead of `mrb_`).
+//!
+//! see: [mruby documentation](https://mruby.org/docs/api/headers.html)
+
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
