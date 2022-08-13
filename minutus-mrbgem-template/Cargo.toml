@@ -1,6 +1,6 @@
 [package]
 name = "minutus-mrbgem-template"
-version = "0.2.1"
+version = "0.3.0"
 edition = "2021"
 license = "MIT"
 authors = ["Yusuke Sangenya <longinus.eva@gmail.com>"]
@@ -10,10 +10,10 @@ keywords = ["cli", "mruby", "ruby"]
 categories = ["command-line-utilities"]
 
 [build-dependencies]
-minutus = { version = "0.2", path = "../minutus", features = ["mruby_3_1_0"] }
+minutus = { version = "0.3.0", path = "../minutus", features = ["mruby_3_1_0"] }
 
 [dependencies]
-minutus = { version = "0.2", path = "../minutus", features = ["mruby_3_1_0"] }
+minutus = { version = "0.3.0", path = "../minutus", features = ["mruby_3_1_0"] }
 maplit = "1.0.2"
 argopt = "0.3.0"
 convert_case = "0.5.0"

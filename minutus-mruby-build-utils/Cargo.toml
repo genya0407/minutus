@@ -1,6 +1,6 @@
 [package]
 name = "minutus-mruby-build-utils"
-version = "0.2.1"
+version = "0.3.0"
 edition = "2021"
 license = "MIT"
 authors = ["Yusuke Sangenya <longinus.eva@gmail.com>"]
