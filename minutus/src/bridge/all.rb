@@ -37,10 +37,4 @@ contents = files.map do |name|
 end
 all = [headers, *contents].join("\n")
 
-require 'open3'
-
-stdin, stdout, _ = *Open3.popen3('clang-format')
-stdin.write(all)
-stdin.close
-
-puts stdout.read
+puts all

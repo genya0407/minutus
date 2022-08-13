@@ -10,14 +10,13 @@ fn check_command(cmd: &[&str]) {
         .output()
         .is_err()
     {
-        println!("cargo:warning=ruby command does not exist");
-        panic!("ruby command does not exist");
+        println!("cargo:warning={} command does not exist", cmd[1]);
+        panic!("{} command does not exist", cmd[1]);
     }
 }
 
 fn main() -> Result<()> {
     check_command(&["ruby", "-v"]);
-    check_command(&["clang-format", "--help"]);
 
     println!("cargo:rerun-if-changed=src/bridge");
     println!("cargo:rerun-if-changed=build.rs");
