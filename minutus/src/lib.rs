@@ -1,9 +1,9 @@
-#![doc = include_str!("../../README.md")]
+//! Minutus is a library which enables you to 1) embed mruby into your Rust project, and 2) create mrbgem in Rust.
 
 pub mod data;
 pub mod types;
 
-/// Define methods for `MinuValue`.
+/// Define methods for [MinuValue][`types::MinuValue`].
 ///
 /// # Examples
 ///
@@ -22,7 +22,7 @@ pub mod types;
 /// ```
 pub use minutus_macros::define_funcall;
 
-/// Define methods for `DataPtr`.
+/// Define methods for [DataPtr][`data::DataPtr`].
 ///
 /// # Examples
 ///
@@ -69,7 +69,7 @@ pub use minutus_macros::define_funcall;
 /// ```
 pub use minutus_macros::extern_methods;
 
-/// Macro that generates `RData` definition for Rust types.
+/// Macro that generates [RData](https://mruby.org/docs/api/headers/mruby_2Fdata.h.html) definition for Rust types.
 ///
 /// # Example
 ///

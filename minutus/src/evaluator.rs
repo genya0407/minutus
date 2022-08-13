@@ -1,9 +1,9 @@
 use crate::mruby::*;
 use crate::types::*;
 
-/// Builds `Evaluator`.
+/// Builds [`Evaluator`].
 ///
-/// If you need more customizable `Evaluator`, see `Evaluator::build()`
+/// If you need more customizable [`Evaluator`], see [`Evaluator::build()`]
 pub fn build_simple_evaluator() -> Evaluator<MinuValue> {
     Evaluator::<MinuValue>::build(|_| {}, MinuValue::from_mrb)
 }
