@@ -8,6 +8,7 @@ description = "mruby bridge for Rust"
 repository = "https://github.com/genya0407/minutus"
 keywords = ["mruby", "ruby"]
 categories = ["api-bindings", "development-tools::ffi"]
+readme = "../README.md"
 
 [build-dependencies]
 minutus-mruby-build-utils = { version = "0.3.0", path = "../minutus-mruby-build-utils" }
