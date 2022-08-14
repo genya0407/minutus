@@ -5,13 +5,15 @@
 ![ci status](https://github.com/genya0407/minutus/actions/workflows/test.yml/badge.svg)
 ![license](https://img.shields.io/github/license/genya0407/minutus)
 
+Minutus is mruby binding for Rust,
+which enables you to treat mruby without writing painful boilerplates.
 Heavily inspired by [Magnus](https://github.com/matsadler/magnus).
 
 By minutus, you can easily [embed mruby in Rust](#embed-mruby-in-rust),
 and [create mrbgem by Rust](#create-mrbgem-by-rust).
 
 Minutus also provides sensible [type casting](#type-casting),
-and you can [define typed functions to mruby values](#define-typed-functions-to-mruby-values)
+and you can [define typed functions on mruby values](#define-typed-functions-on-mruby-values)
 and [wrap rust structs in mruby objects](#wrap-rust-structs-in-mruby-objects).
 
 ## Embed mruby in Rust
@@ -141,7 +143,7 @@ impl TestMrbgem {
 }
 ```
 
-## Define typed functions to mruby values
+## Define typed functions on mruby values
 
 Use `define_funcall!` macro.
 
