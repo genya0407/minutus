@@ -26,16 +26,18 @@ impl Point {
 #[test]
 fn test() {
     use minutus::types::*;
-    let executor = minutus::Evaluator::build(Point::define_class_on_mrb, Point::from_mrb);
-    let point = executor.evaluate("Point.new(1,2, 'dummy')").unwrap();
+    let executor = minutus::Evaluator::build();
+    Point::define_class_on_mrb(executor.mrb());
+    let point = Point::try_from_mrb(executor.evaluate("Point.new(1,2, 'dummy')").unwrap()).unwrap();
     assert_eq!(*point, Point::new(1, 2, String::from("dummy")))
 }
 
 #[test]
 fn stress() {
     use minutus::types::*;
-    let executor = minutus::Evaluator::build(Point::define_class_on_mrb, Point::from_mrb);
-    let point = executor.evaluate("Point.new(1,2, 'dummy')").unwrap();
+    let executor = minutus::Evaluator::build();
+    Point::define_class_on_mrb(executor.mrb());
+    let point = Point::try_from_mrb(executor.evaluate("Point.new(1,2, 'dummy')").unwrap()).unwrap();
     for _ in 0..1000 {
         executor
             .evaluate("GC.start; Point.new(1,2, 'dummy')")

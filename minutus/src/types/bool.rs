@@ -1,24 +1,24 @@
 use super::*;
 
-impl FromMrb<Self> for bool {
-    fn from_mrb(_mrb: *mut minu_state, value: &minu_value) -> Self {
+impl TryFromMrb for bool {
+    fn try_from_mrb(value: MrbValue) -> MrbResult<Self> {
         unsafe {
-            if minu_false_p(*value) || minu_nil_p(*value) {
-                false
+            if minu_false_p(value.val) || minu_nil_p(value.val) {
+                Ok(false)
             } else {
-                true
+                Ok(true)
             }
         }
     }
 }
 
-impl IntoMrb for bool {
-    fn into_mrb(self, _mrb: *mut minu_state) -> minu_value {
+impl TryIntoMrb for bool {
+    fn try_into_mrb(self, mrb: *mut minu_state) -> MrbResult<MrbValue> {
         unsafe {
             if self {
-                minu_true_value()
+                Ok(MrbValue::new(mrb, minu_true_value()))
             } else {
-                minu_false_value()
+                Ok(MrbValue::new(mrb, minu_false_value()))
             }
         }
     }

@@ -10,34 +10,33 @@ pub fn define_tuple(n: usize) -> proc_macro2::TokenStream {
         .collect();
 
     let q = quote::quote! {
-        impl<#(#ty: FromMrb<#ty>),*> FromMrb<Self> for (#(#ty,)*) {
-            fn from_mrb(mrb: *mut minu_state, value: &minu_value) -> Self {
+        impl<#(#ty: TryFromMrb),*> TryFromMrb for (#(#ty,)*) {
+            fn try_from_mrb(value: MrbValue) -> MrbResult<Self> {
                 unsafe {
-                    if minu_array_p(*value) {
-                        let len = minu_rarray_len(*value) as usize;
+                    if minu_array_p(value.val) {
+                        let len = minu_rarray_len(value.val) as usize;
                         if len == #n {
-                            return (
+                            return Ok((
                                 #(
-                                    #ty::from_mrb(mrb, &minu_ary_ref(*value, #index)),
+                                    #ty::try_from_mrb(MrbValue::new(value.mrb, minu_ary_ref(value.val, #index)))?,
                                 )*
-                            )
+                            ))
                         }
                     }
 
-                    let tname = format!("Tuple(len = {})", #n);
-                    crate::utils::raise_type_mismatch_argument_error(mrb, *value, &tname)
+                    Err(MrbConversionError::new(&format!("Tuple(len = {})", #n)))
                 }
             }
         }
 
-        impl<#(#ty: IntoMrb),*> IntoMrb for (#(#ty,)*) {
-            fn into_mrb(self, mrb: *mut minu_state) -> minu_value {
+        impl<#(#ty: TryIntoMrb),*> TryIntoMrb for (#(#ty,)*) {
+            fn try_into_mrb(self, mrb: *mut minu_state) -> MrbResult<MrbValue> {
                 unsafe {
                     let ary = minu_ary_new_capa(mrb, #n as _);
                     #(
-                        minu_ary_push(mrb, ary, #field_access.into_mrb(mrb));
+                        minu_ary_push(mrb, ary, #field_access.try_into_mrb(mrb)?.val);
                     )*
-                    return ary;
+                    return Ok(MrbValue::new(mrb, ary));
                 }
             }
         }

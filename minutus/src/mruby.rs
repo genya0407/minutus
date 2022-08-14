@@ -59,7 +59,7 @@ pub use internal::{
 pub use internal::{minu_intern_cstr, minu_obj_to_sym, minu_sym2name, minu_symbol_value};
 
 // other
-pub use internal::{minu_close, minu_inspect, minu_load_string, minu_open};
+pub use internal::{minu_close, minu_inspect, minu_load_string, minu_obj_is_kind_of, minu_open};
 
 extern "C" {
     #[link_name = "mrb_get_args"]
@@ -88,6 +88,29 @@ pub unsafe fn minu_raise(
 ) -> ! {
     internal::mrb_raise(mrb, c, msg);
     panic!("should never come here!")
+}
+
+pub unsafe fn raise_type_mismatch_argument_error(
+    mrb: *mut minu_state,
+    value: minu_value,
+    type_name: String,
+    msg: String,
+) -> ! {
+    let value_inspected = minu_inspect(mrb, value);
+    let value_inspected_str =
+        std::ffi::CStr::from_ptr(crate::mruby::minu_str_to_cstr(mrb, value_inspected));
+    let message = format!(
+        "{} cannot be converted into {}: {}",
+        value_inspected_str.to_str().unwrap(),
+        type_name,
+        msg
+    );
+    let message_cstr = std::ffi::CString::new(message).unwrap();
+    minu_raise(
+        mrb,
+        crate::mruby::minu_class_get(mrb, "ArgumentError\0".as_ptr() as _),
+        message_cstr.as_ptr(),
+    )
 }
 
 mod internal {

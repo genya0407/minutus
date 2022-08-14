@@ -30,6 +30,10 @@ pub fn derive_data(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
         }
 
         impl ::minutus::data::MrbData for #ident {
+            fn minu_class_name() -> String {
+                #class_name.to_string()
+            }
+
             fn minu_class(mrb: *mut ::minutus::mruby::minu_state) -> *mut ::minutus::mruby::RClass {
                 unsafe {
                     let class = ::minutus::mruby::minu_define_class(
@@ -47,19 +51,19 @@ pub fn derive_data(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
             }
         }
 
-        impl ::minutus::types::FromMrb<::minutus::data::DataPtr<#ident>> for #ident {
-            fn from_mrb<'a>(mrb: *mut ::minutus::mruby::minu_state, value: &::minutus::mruby::minu_value) -> ::minutus::data::DataPtr<#ident> {
+        impl ::minutus::types::TryFromMrb<::minutus::data::DataPtr<#ident>> for #ident {
+            fn try_from_mrb<'a>(value: ::minutus::types::MrbValue) -> ::minutus::types::MrbResult<::minutus::data::DataPtr<#ident>> {
                 use minutus::data::MrbData;
 
-                #ident::from_mrb_data(mrb, value)
+                #ident::try_from_mrb_data(value)
             }
         }
 
-        impl ::minutus::types::IntoMrb for #ident {
-            fn into_mrb(self, mrb: *mut ::minutus::mruby::minu_state) -> ::minutus::mruby::minu_value {
+        impl ::minutus::types::TryIntoMrb for #ident {
+            fn try_into_mrb(self, mrb: *mut ::minutus::mruby::minu_state) -> ::minutus::types::MrbResult<::minutus::types::MrbValue> {
                 use minutus::data::MrbData;
 
-                #ident::into_mrb_data(self, mrb)
+                #ident::try_into_mrb_data(self, mrb)
             }
         }
     };

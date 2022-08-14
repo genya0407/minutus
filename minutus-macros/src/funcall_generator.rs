@@ -59,7 +59,7 @@ pub fn generate_methods(input: TokenStream) -> TokenStream {
                   unsafe {
                       #mrb_definition;
                       #(
-                          let #argument_name = #argument_name.into_mrb(mrb);
+                          let #argument_name = #argument_name.try_into_mrb(mrb).unwrap().val;
                       )*
                       let result = minu_funcall(
                           mrb,
@@ -69,10 +69,10 @@ pub fn generate_methods(input: TokenStream) -> TokenStream {
                           #(#argument_name),*
                       );
                       if minu_exception_p(result) {
-                          let e = String::from_mrb(mrb, &minu_inspect(mrb, result));
+                          let e = String::try_from_mrb(MrbValue::new(mrb, minu_inspect(mrb, result))).unwrap();
                           panic!("{}", e);
                       }
-                      <#return_type>::from_mrb(mrb, &result)
+                      <#return_type>::try_from_mrb(MrbValue::new(mrb, result)).unwrap()
                   }
               }
           };
@@ -227,7 +227,7 @@ pub fn define_funcall(input: TokenStream) -> TokenStream {
                     let mrb_method_name_cstr = std::ffi::CString::new(mrb_method_name).unwrap();
                     unsafe {
                         #(
-                            let #argument_name = #argument_name.into_mrb(self.mrb);
+                            let #argument_name = #argument_name.try_into_mrb(self.mrb).unwrap().val;
                         )*
                         let result = minu_funcall(
                             self.mrb,
@@ -237,10 +237,10 @@ pub fn define_funcall(input: TokenStream) -> TokenStream {
                             #(#argument_name),*
                         );
                         if minu_exception_p(result) {
-                            let e = String::from_mrb(self.mrb, &minu_inspect(self.mrb, result));
+                            let e = String::try_from_mrb(MrbValue::new(self.mrb, minu_inspect(self.mrb, result))).unwrap();
                             panic!("{}", e);
                         }
-                        <#return_type>::from_mrb(self.mrb, &result)
+                        <#return_type>::try_from_mrb(MrbValue::new(self.mrb, result)).unwrap()
                     }
                 }
             };

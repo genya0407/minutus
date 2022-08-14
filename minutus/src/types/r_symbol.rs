@@ -35,17 +35,18 @@ impl RSymbol {
     }
 }
 
-impl FromMrb<RSymbol> for RSymbol {
-    fn from_mrb(mrb: *mut minu_state, value: &minu_value) -> Self {
+impl TryFromMrb for RSymbol {
+    fn try_from_mrb(value: MrbValue) -> MrbResult<Self> {
         unsafe {
-            let mid = minu_obj_to_sym(mrb, *value);
-            Self { mid }
+            // TODO: type check
+            let mid = minu_obj_to_sym(value.mrb, value.val);
+            Ok(Self { mid })
         }
     }
 }
 
-impl IntoMrb for RSymbol {
-    fn into_mrb(self, _mrb: *mut minu_state) -> minu_value {
-        unsafe { minu_symbol_value(self.mid) }
+impl TryIntoMrb for RSymbol {
+    fn try_into_mrb(self, mrb: *mut minu_state) -> MrbResult<MrbValue> {
+        unsafe { Ok(MrbValue::new(mrb, minu_symbol_value(self.mid))) }
     }
 }

@@ -1,5 +1,4 @@
 use minutus::mruby::*;
-use minutus::types::*;
 
 pub struct Executor {
     pub initializer: fn(*mut minu_state),
@@ -7,7 +6,8 @@ pub struct Executor {
 
 impl Executor {
     pub fn execute(&self, script: &str) {
-        let evaluator = minutus::Evaluator::build(self.initializer, <()>::from_mrb);
+        let evaluator = minutus::Evaluator::build();
+        (self.initializer)(evaluator.mrb());
 
         evaluator
             .evaluate(
