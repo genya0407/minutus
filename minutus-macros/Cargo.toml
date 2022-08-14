@@ -1,6 +1,6 @@
 [package]
 name = "minutus-macros"
-version = "0.3.0"
+version = "0.3.2"
 edition = "2021"
 license = "MIT"
 authors = ["Yusuke Sangenya <longinus.eva@gmail.com>"]
