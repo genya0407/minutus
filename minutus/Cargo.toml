@@ -22,7 +22,6 @@ flate2 = "1.0.24"
 [dependencies]
 minutus-macros = { version = "0.3.0", path = "../minutus-macros" }
 minutus-mruby-build-utils = { version = "0.3.2-alpha.1", path = "../minutus-mruby-build-utils" }
-doc-comment = "0.3.3"
 
 [features]
 mruby_3_1_0 = []

@@ -4,16 +4,7 @@ on: [push, pull_request]
 jobs:
   cargo_test:
     name: cargo test
-    strategy:
-      matrix:
-        mruby_version:
-          - "3_1_0"
-        os:
-          - "ubuntu-latest"
-          # - "macos-lastst"
-          # - "windows-latest"
-
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v1
@@ -25,7 +16,7 @@ jobs:
         with:
           toolchain: stable
           override: true
-      - run: cargo test -vv --features mruby_${{ matrix.mruby_version }}
+      - run: cargo test --workspace
 
   integration_test:
     name: run all integration tests

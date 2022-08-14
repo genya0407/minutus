@@ -1,7 +1,5 @@
 //! Minutus is a library which enables you to 1) embed mruby into your Rust project, and 2) create mrbgem in Rust.
 
-doc_comment::doctest!("../../README.md");
-
 pub mod data;
 pub mod types;
 
