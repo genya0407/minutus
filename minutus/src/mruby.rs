@@ -52,7 +52,7 @@ pub use internal::{minu_gc_register, minu_gc_unregister};
 
 // Exception
 pub use internal::{
-    minu_exc_backtrace, minu_get_backtrace, minu_print_backtrace, minu_print_error,
+    minu_exc_backtrace, minu_get_backtrace, minu_print_backtrace, minu_print_error, minu_protect,
 };
 
 // Symbol
@@ -80,6 +80,7 @@ extern "C" {
         ...
     ) -> minu_value;
 }
+pub use internal::{minu_funcall_argv, minu_funcall_with_block};
 
 pub unsafe fn minu_raise(
     mrb: *mut minu_state,

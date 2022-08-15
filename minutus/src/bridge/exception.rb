@@ -14,4 +14,8 @@ minu_value minu_get_backtrace(mrb_state *mrb) {
 minu_value minu_exc_backtrace(mrb_state *mrb, mrb_value exc) {
   return mrb_exc_backtrace(mrb, exc);
 }
+
+minu_value minu_protect(minu_state * mrb, minu_func_t body, minu_value data, minu_bool * state) {
+  return mrb_protect(mrb, body, data, state);
+}
 CODE
