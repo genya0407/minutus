@@ -144,6 +144,12 @@ crate-type = [\"staticlib\"]"
         test_rb,
     )?;
 
+    let build_config_path = mrbgem_dir.join(".github_actions_build_config.rb");
+    let build_config = std::fs::read_to_string(&build_config_path)?;
+    let full_core_build_config =
+        build_config.replace("conf.gembox 'default'", "conf.gembox 'full-core'");
+    std::fs::write(&build_config_path, full_core_build_config)?;
+
     Ok(())
 }
 
