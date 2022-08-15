@@ -7,7 +7,11 @@ impl TryFromMrb for String {
                 let cstr = std::ffi::CStr::from_ptr(minu_str_to_cstr(value.mrb, value.val));
                 Ok(cstr.to_string_lossy().into_owned())
             } else {
-                Err(MrbConversionError::new("String"))
+                let inspected = minu_inspect(value.mrb, value.val);
+                let inspected_string = String::try_from_mrb(MrbValue::new(value.mrb, inspected))?;
+                Err(MrbConversionError {
+                    msg: format!("{} could not converted into String", inspected_string),
+                })
             }
         }
     }
