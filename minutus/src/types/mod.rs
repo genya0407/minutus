@@ -44,6 +44,20 @@ pub trait TryFromMrb<Target = Self>: Sized {
     fn try_from_mrb(value: MrbValue) -> MrbResult<Target>;
 }
 
+pub trait IntoArgs {
+    type Output: AsRef<[minu_value]>;
+
+    fn into_args(self, mrb: *mut minu_state) -> MrbResult<Self::Output>;
+}
+
+impl IntoArgs for () {
+    type Output = [minu_value; 0];
+
+    fn into_args(self, _mrb: *mut minu_state) -> MrbResult<Self::Output> {
+        Ok([])
+    }
+}
+
 /// Represents values returned from mruby world.
 ///
 /// Using `minutus::define_funcall` macro, you can define arbitrary methods to this type.
@@ -56,6 +70,35 @@ pub struct MrbValue {
 impl MrbValue {
     pub fn new(mrb: *mut minu_state, val: minu_value) -> Self {
         Self { mrb, val }
+    }
+
+    /// Call mruby's method.
+    ///
+    /// ```
+    /// let runtime = minutus::Evaluator::build();
+    /// let int_123 = runtime.evaluate("123").unwrap();
+    ///
+    /// let inspected: String = int_123.call("inspect", ()).unwrap();
+    /// assert_eq!("123", inspected);
+    ///
+    /// let inspected: i64 = int_123.call("+", (100,)).unwrap();
+    /// assert_eq!(223, inspected);
+    /// ```
+    pub fn call<ARGS: IntoArgs, RETVAL: TryFromMrb>(
+        &self,
+        name: &str,
+        args: ARGS,
+    ) -> MrbResult<RETVAL> {
+        let args = args.into_args(self.mrb)?;
+        let argv = args.as_ref();
+        let argc = argv.len();
+        let mid = RSymbol::new(self.mrb, name).mid();
+        let val =
+            unsafe { minu_funcall_argv(self.mrb, self.val, mid, argc as _, argv.as_ptr() as _) };
+        println!("{}", unsafe {
+            String::try_from_mrb(MrbValue::new(self.mrb, minu_inspect(self.mrb, val)))?
+        });
+        RETVAL::try_from_mrb(Self::new(self.mrb, val))
     }
 }
 

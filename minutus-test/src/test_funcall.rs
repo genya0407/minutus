@@ -68,3 +68,21 @@ pub fn test_define_funcall() {
     let inspected = inspected.inspect();
     println!("{}", inspected);
 }
+
+#[test]
+pub fn test_dynamic_call_1() {
+    let runtime = minutus::Evaluator::build();
+    let retval = runtime.evaluate("123").unwrap();
+
+    let inspected: String = retval.call("inspect", ()).unwrap();
+    assert_eq!("123", inspected);
+}
+
+#[test]
+pub fn test_dynamic_call_2() {
+    let runtime = minutus::Evaluator::build();
+    let retval = runtime.evaluate("123").unwrap();
+
+    let inspected: i64 = retval.call("+", (100,)).unwrap();
+    assert_eq!(223, inspected);
+}

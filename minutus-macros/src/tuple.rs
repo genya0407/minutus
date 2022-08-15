@@ -8,6 +8,7 @@ pub fn define_tuple(n: usize) -> proc_macro2::TokenStream {
         .into_iter()
         .map(|i| format!("self.{}", i).parse().unwrap())
         .collect();
+    let type_count = ty.len();
 
     let q = quote::quote! {
         impl<#(#ty: TryFromMrb),*> TryFromMrb for (#(#ty,)*) {
@@ -41,6 +42,13 @@ pub fn define_tuple(n: usize) -> proc_macro2::TokenStream {
             }
         }
 
+        impl<#(#ty: TryIntoMrb + Clone),*> IntoArgs for (#(#ty,)*) {
+            type Output = [minu_value; #type_count];
+
+            fn into_args(self, mrb: *mut minu_state) ->  MrbResult<[minu_value; #type_count]> {
+                Ok([#(#field_access.try_into_mrb(mrb)?.val),*])
+            }
+        }
     };
     q.into()
 }
