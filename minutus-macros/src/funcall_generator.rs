@@ -16,7 +16,6 @@ pub fn generate_methods(input: TokenStream) -> TokenStream {
           let mrb_method_name = &method_signature.mrb_name;
           let argument_name: Vec<_> = method_signature.args.iter().map(|a| &a.ident).collect();
           let argument_type: Vec<_> = method_signature.args.iter().map(|a| &a.ty).collect();
-          let return_signature = &method_signature.ret_type;
           let return_type = match &method_signature.ret_type {
               syn::ReturnType::Default => quote!{ () },
               syn::ReturnType::Type(_, t) => quote! { #t }
@@ -42,14 +41,14 @@ pub fn generate_methods(input: TokenStream) -> TokenStream {
               fn #method_name(
                   #slf
                   #(,#argument_name:#argument_type)*
-              ) #return_signature;
+              ) -> ::minutus::types::MrbResult<#return_type>;
           };
 
           let method_body = quote! {
               fn #method_name(
                   #slf
                   #(,#argument_name:#argument_type)*
-              ) #return_signature {
+              ) -> ::minutus::types::MrbResult<#return_type> {
                   use ::minutus::types::*;
                   use ::minutus::data::*;
                   use ::minutus::mruby::*;
@@ -59,7 +58,7 @@ pub fn generate_methods(input: TokenStream) -> TokenStream {
                   unsafe {
                       #mrb_definition;
                       #(
-                          let #argument_name = #argument_name.try_into_mrb(mrb).unwrap().val;
+                          let #argument_name = #argument_name.try_into_mrb(mrb)?.val;
                       )*
                       let result = minu_funcall(
                           mrb,
@@ -69,10 +68,10 @@ pub fn generate_methods(input: TokenStream) -> TokenStream {
                           #(#argument_name),*
                       );
                       if minu_exception_p(result) {
-                          let e = String::try_from_mrb(MrbValue::new(mrb, minu_inspect(mrb, result))).unwrap();
-                          panic!("{}", e);
+                        let e = String::try_from_mrb(MrbValue::new(mrb, minu_inspect(mrb, result))).expect("Failed to convert raised Exception into String");
+                        return Err(MrbConversionError::new(&e));
                       }
-                      <#return_type>::try_from_mrb(MrbValue::new(mrb, result)).unwrap()
+                      <#return_type>::try_from_mrb(MrbValue::new(mrb, result))
                   }
               }
           };

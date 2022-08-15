@@ -39,13 +39,16 @@ pub fn test_funcall() {
     let runtime = Evaluator::build();
     Point::define_class_on_mrb(runtime.mrb());
     let point = Point::try_from_mrb(runtime.evaluate("Point.new(1,2,'test')").unwrap()).unwrap();
-    assert_regex_match(r"#<Point:0x[0-9a-f]+>", &point.inspect_2());
-    assert_regex_match(r"#<Point:0x[0-9a-f]+>", &point.to_s());
+    assert_regex_match(r"#<Point:0x[0-9a-f]+>", &point.inspect_2().unwrap());
+    assert_regex_match(r"#<Point:0x[0-9a-f]+>", &point.to_s().unwrap());
     assert_regex_match(
         r"#<Point:0x[0-9a-f]+>",
-        &Point::new_2(runtime.mrb(), 100, 200, String::from("hogeee")).to_s(),
+        &Point::new_2(runtime.mrb(), 100, 200, String::from("hogeee"))
+            .unwrap()
+            .to_s()
+            .unwrap(),
     );
-    assert_eq!("Point", &Point::name(runtime.mrb()));
+    assert_eq!("Point", &Point::name(runtime.mrb()).unwrap());
 }
 
 fn assert_regex_match(pat: &str, val: &str) {
