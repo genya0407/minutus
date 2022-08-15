@@ -16,8 +16,8 @@ pub mod types;
 /// fn main() {
 ///     let runtime = minutus::Evaluator::build();
 ///     let mruby_array: minutus::types::MrbValue = runtime.evaluate("['aaa', 'bbb']").unwrap();
-///     assert_eq!("[\"aaa\", \"bbb\"]", mruby_array.inspect());
-///     assert_eq!(vec![String::from("aaa"), String::from("bbb"), String::from("ccc")], mruby_array.concat(vec!["ccc"]));
+///     assert_eq!("[\"aaa\", \"bbb\"]", mruby_array.inspect().unwrap());
+///     assert_eq!(vec![String::from("aaa"), String::from("bbb"), String::from("ccc")], mruby_array.concat(vec!["ccc"]).unwrap());
 /// }
 /// ```
 pub use minutus_macros::define_funcall;

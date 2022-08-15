@@ -59,14 +59,15 @@ minutus::define_funcall! {
 }
 
 #[test]
-pub fn test_define_funcall() {
+pub fn test_define_funcall() -> minutus::types::MrbResult<()> {
     let runtime = minutus::Evaluator::build();
     let retval = runtime.evaluate("123").unwrap();
-    let inspected = retval.inspect();
+    let inspected = retval.inspect()?;
     println!("{}", inspected);
-    let inspected = retval.inspect_2();
-    let inspected = inspected.inspect();
+    let inspected = retval.inspect_2()?;
+    let inspected = inspected.inspect()?;
     println!("{}", inspected);
+    Ok(())
 }
 
 #[test]

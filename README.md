@@ -52,7 +52,7 @@ fn main() {
 
     // call `some_method` on main object from Rust world.
     // in / out values are type-casted, according to `define_funcall!` definition
-    let retval: i64 = main.some_method(vec![1,2,3,4]);
+    let retval: i64 = main.some_method(vec![1,2,3,4]).unwrap();
     println!("retval is {}", retval);
 }
 ```
@@ -157,8 +157,8 @@ fn main() {
     let runtime = minutus::Evaluator::build();
 
     let mruby_array = runtime.evaluate("['aaa', 'bbb']").unwrap();
-    assert_eq!("[\"aaa\", \"bbb\"]", mruby_array.inspect());
-    assert_eq!(vec![String::from("aaa"), String::from("bbb"), String::from("ccc")], mruby_array.concat(vec!["ccc"]));
+    assert_eq!("[\"aaa\", \"bbb\"]", mruby_array.inspect().unwrap());
+    assert_eq!(vec![String::from("aaa"), String::from("bbb"), String::from("ccc")], mruby_array.concat(vec!["ccc"]).unwrap());
 }
 ```
 

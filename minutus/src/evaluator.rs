@@ -15,7 +15,7 @@ use crate::types::*;
 ///     // prints [1,2,3] and returns `MrbValue` which holds `[1,2,3]`
 ///     let array = runtime.evaluate("p [1,2,3]").unwrap();
 ///     // `concat` returns Vec<i64> because of the `define_funcall` definition.
-///     let concat_array = array.concat(vec![4,5,6]);
+///     let concat_array = array.concat(vec![4,5,6]).unwrap();
 ///     assert_eq!(vec![1,2,3,4,5,6], concat_array);
 /// }
 /// ```

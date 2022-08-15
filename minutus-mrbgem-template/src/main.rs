@@ -188,8 +188,8 @@ fn initialize_by_mrbgem_template(
             Some(v) => v.try_into_mrb(mrb)?,
             None => unsafe  { MrbValue::new(mrb, minu_nil_value()) },
         }
-    });
-    c.create();
+    })?;
+    c.create().map_err(|e| anyhow!(e))?;
     Ok(())
 }
 

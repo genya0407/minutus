@@ -202,7 +202,6 @@ pub fn define_funcall(input: TokenStream) -> TokenStream {
             let mrb_method_name = &method_signature.mrb_name;
             let argument_name: Vec<_> = method_signature.args.iter().map(|a| &a.ident).collect();
             let argument_type: Vec<_> = method_signature.args.iter().map(|a| &a.ty).collect();
-            let return_signature = &method_signature.ret_type;
             let return_type = match &method_signature.ret_type {
                 syn::ReturnType::Default => quote! { () },
                 syn::ReturnType::Type(_, t) => quote! { #t },
@@ -212,13 +211,13 @@ pub fn define_funcall(input: TokenStream) -> TokenStream {
             let method_sig = quote! {
                 fn #method_name(
                     &self #(,#argument_name:#argument_type)*
-                ) #return_signature;
+                ) -> ::minutus::types::MrbResult<#return_type>;
             };
 
             let method_body = quote! {
                 fn #method_name(
                     &self #(,#argument_name:#argument_type)*
-                ) #return_signature {
+                ) -> ::minutus::types::MrbResult<#return_type> {
                     use ::minutus::types::*;
                     use ::minutus::data::*;
                     use ::minutus::mruby::*;
@@ -235,10 +234,10 @@ pub fn define_funcall(input: TokenStream) -> TokenStream {
                             args.as_ptr()
                         );
                         if minu_exception_p(result) {
-                            let e = String::try_from_mrb(MrbValue::new(self.mrb, minu_inspect(self.mrb, result))).unwrap();
-                            panic!("{}", e);
+                            let e = String::try_from_mrb(MrbValue::new(self.mrb, minu_inspect(self.mrb, result))).expect("Failed to convert raised Exception into String");
+                            return Err(MrbConversionError::new(&e));
                         }
-                        <#return_type>::try_from_mrb(MrbValue::new(self.mrb, result)).unwrap()
+                        <#return_type>::try_from_mrb(MrbValue::new(self.mrb, result))
                     }
                 }
             };
