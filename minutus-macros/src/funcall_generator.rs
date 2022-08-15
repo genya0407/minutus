@@ -224,17 +224,15 @@ pub fn define_funcall(input: TokenStream) -> TokenStream {
                     use ::minutus::mruby::*;
 
                     let mrb_method_name = #mrb_method_name;
-                    let mrb_method_name_cstr = std::ffi::CString::new(mrb_method_name).unwrap();
+                    let mrb_method_name_sym = RSymbol::new(self.mrb, mrb_method_name).mid();
                     unsafe {
-                        #(
-                            let #argument_name = #argument_name.try_into_mrb(self.mrb).unwrap().val;
-                        )*
-                        let result = minu_funcall(
+                        let args = &[#(#argument_name.try_into_mrb(self.mrb).unwrap().val as _),*];
+                        let result = minu_funcall_argv(
                             self.mrb,
                             self.val,
-                            mrb_method_name_cstr.as_ptr(),
+                            mrb_method_name_sym,
                             #argc as _,
-                            #(#argument_name),*
+                            args.as_ptr()
                         );
                         if minu_exception_p(result) {
                             let e = String::try_from_mrb(MrbValue::new(self.mrb, minu_inspect(self.mrb, result))).unwrap();

@@ -33,6 +33,10 @@ impl RSymbol {
             cstr.to_string_lossy().into_owned()
         }
     }
+
+    pub fn mid(&self) -> minu_sym {
+        self.mid
+    }
 }
 
 impl TryFromMrb for RSymbol {
