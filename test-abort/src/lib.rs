@@ -34,7 +34,7 @@ fn test_funcall_exception() {
 
 #[allow(dead_code)]
 unsafe extern "C" fn callback(mrb: *mut minu_state, _val: minu_value) -> minu_value {
-    // This raises error, and aborts process
+    // This raises error, and will caught by protect
     minu_raise(mrb, (*mrb).eStandardError_class, "errro!\0".as_ptr() as _);
 }
 
