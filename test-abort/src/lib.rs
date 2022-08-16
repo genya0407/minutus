@@ -1,7 +1,7 @@
+use minutus::mruby::*;
+
 #[test]
 fn test_load_string_exception() {
-    use minutus::mruby::*;
-
     unsafe {
         let mrb = minu_open();
 
@@ -18,8 +18,6 @@ fn test_load_string_exception() {
 
 #[test]
 fn test_funcall_exception() {
-    use minutus::mruby::*;
-
     unsafe {
         let mrb = minu_open();
 
@@ -30,6 +28,28 @@ fn test_funcall_exception() {
             "nonexistent_method\0".as_ptr() as _,
             0,
         );
+        assert!(minu_exception_p(result));
+    }
+}
+
+#[allow(dead_code)]
+unsafe extern "C" fn callback(mrb: *mut minu_state, _val: minu_value) -> minu_value {
+    // This raises error, and aborts process
+    minu_raise(mrb, (*mrb).eStandardError_class, "errro!\0".as_ptr() as _);
+}
+
+#[test]
+fn test_protect() {
+    use minutus::mruby::*;
+
+    unsafe {
+        let mrb = minu_open();
+
+        let mut state = false;
+        // callback raises exception, and minu_protect catches it
+        let result = minu_protect(mrb, Some(callback), minu_nil_value(), &mut state);
+
+        assert!(state);
         assert!(minu_exception_p(result));
     }
 }

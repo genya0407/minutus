@@ -76,6 +76,7 @@ fn main() -> Result<()> {
     MRubyManager::new()
         .mruby_version(&mruby_version())
         .link(do_link)
+        .build_config(&env::current_dir()?.join("build_config.rb"))
         .run();
     compile_bridge()?;
 
