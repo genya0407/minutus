@@ -17,6 +17,7 @@ members = [
     "minutus-mruby-build-utils",
     "minutus-mrbgem-template",
     "minutus-test",
+    "test-abort",
 ]
 exclude = ["examples"]
 
