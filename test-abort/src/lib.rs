@@ -100,3 +100,46 @@ error: test failed, to rerun pass '--lib'
 Caused by:
   process didn't exit successfully: `/Users/sangenya/dev/minutus/target/debug/deps/test_abort-8f671ec3e349e0da` (signal: 6, SIGABRT: process abort signal)
  */
+
+struct DropTarget;
+
+impl Drop for DropTarget {
+    fn drop(&mut self) {
+        panic!("Drop occured!")
+    }
+}
+
+#[allow(dead_code)]
+unsafe extern "C" fn callback2(mrb: *mut minu_state, _val: minu_value) -> minu_value {
+    // When `_d` dropped, it panics
+    let _d = DropTarget;
+
+    // This raises error
+    minu_raise(mrb, (*mrb).eStandardError_class, "errro!\0".as_ptr() as _);
+}
+
+#[test]
+fn test_drop_do_not_occur() {
+    unsafe {
+        let mrb = minu_open();
+
+        let mut state = false;
+        // This does not cause panic because callback2's frame is unwinded and `drop` is not called on `_d`
+        let result = minu_protect(mrb, Some(callback2), minu_nil_value(), &mut state);
+
+        assert!(state);
+        assert!(minu_exception_p(result));
+    }
+}
+
+#[test]
+#[should_panic(expected = "Drop occured!")]
+fn test_drop_occur() {
+    unsafe {
+        let _d = DropTarget;
+        let mrb = minu_open();
+
+        // An exception raised inside minu_load_string, and `_d` is droppped because frame isn't unwinded.
+        minu_load_string(mrb, "raise 'error'\0".as_ptr() as _);
+    }
+}
