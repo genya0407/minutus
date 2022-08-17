@@ -1,3 +1,4 @@
+use darling::ToTokens;
 use proc_macro::{self, TokenStream};
 use quote::{format_ident, quote};
 use syn::parse_macro_input;
@@ -192,6 +193,7 @@ impl syn::parse::Parse for MethodDefinitions {
 pub fn define_funcall(input: TokenStream) -> TokenStream {
     let method_definitions = parse_macro_input!(input as FuncallDefinitions);
 
+    let target_type = method_definitions.ty;
     let trait_name = format_ident!("FuncallDefinition");
     let method: Vec<_> = method_definitions
         .method_signatures
@@ -222,21 +224,21 @@ pub fn define_funcall(input: TokenStream) -> TokenStream {
                     use ::minutus::mruby::*;
 
                     let mrb_method_name = #mrb_method_name;
-                    let mrb_method_name_sym = RSymbol::new(self.mrb, mrb_method_name).mid();
+                    let mrb_method_name_sym = RSymbol::new(self.mrb(), mrb_method_name).mid();
                     unsafe {
-                        let args = &[#(#argument_name.try_into_mrb(self.mrb).unwrap().val as _),*];
+                        let args = &[#(#argument_name.try_into_mrb(self.mrb()).unwrap().val as _),*];
                         let result = minu_funcall_argv(
-                            self.mrb,
-                            self.val,
+                            self.mrb(),
+                            self.val(),
                             mrb_method_name_sym,
                             #argc as _,
                             args.as_ptr()
                         );
                         if minu_exception_p(result) {
-                            let e = String::try_from_mrb(MrbValue::new(self.mrb, minu_inspect(self.mrb, result))).expect("Failed to convert raised Exception into String");
+                            let e = String::try_from_mrb(MrbValue::new(self.mrb(), minu_inspect(self.mrb(), result))).expect("Failed to convert raised Exception into String");
                             return Err(MrbConversionError::new(&e));
                         }
-                        <#return_type>::try_from_mrb(MrbValue::new(self.mrb, result))
+                        <#return_type>::try_from_mrb(MrbValue::new(self.mrb(), result))
                     }
                 }
             };
@@ -249,11 +251,11 @@ pub fn define_funcall(input: TokenStream) -> TokenStream {
     let method_body: Vec<_> = method.iter().map(|m| &m.2).collect();
 
     quote! {
-        trait #trait_name {
+        trait #trait_name: ::minutus::types::MrbValueLike + ::minutus::types::TryFromMrb + ::minutus::types::TryIntoMrb {
             #(#method_sig)*
         }
 
-        impl #trait_name for ::minutus::types::MrbValue {
+        impl #trait_name for #target_type {
             #(#method_body)*
         }
     }
@@ -262,16 +264,28 @@ pub fn define_funcall(input: TokenStream) -> TokenStream {
 
 #[derive(Clone, Debug)]
 struct FuncallDefinitions {
+    ty: proc_macro2::TokenStream,
     method_signatures: Vec<FuncallSignature>,
 }
 
 impl syn::parse::Parse for FuncallDefinitions {
     fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
+        let ty: proc_macro2::TokenStream = if input.peek(syn::Ident) {
+            let ident = input.parse::<syn::Ident>()?;
+            input.parse::<syn::Token![;]>()?;
+            ident.to_token_stream()
+        } else {
+            quote! { ::minutus::types::MrbValue }
+        };
+
         let method_signatures: Vec<_> = input
             .parse_terminated::<FuncallSignature, syn::Token![;]>(FuncallSignature::parse)?
             .into_iter()
             .collect();
 
-        Ok(Self { method_signatures })
+        Ok(Self {
+            ty,
+            method_signatures,
+        })
     }
 }

@@ -58,6 +58,20 @@ impl IntoArgs for () {
     }
 }
 
+pub trait MrbValueLike {
+    fn mrb(&self) -> *mut minu_state;
+    fn val(&self) -> minu_value;
+}
+
+impl MrbValueLike for MrbValue {
+    fn mrb(&self) -> *mut minu_state {
+        self.mrb
+    }
+    fn val(&self) -> minu_value {
+        self.val
+    }
+}
+
 /// Represents values returned from mruby world.
 ///
 /// Using `minutus::define_funcall` macro, you can define arbitrary methods to this type.

@@ -20,6 +20,55 @@ pub mod types;
 ///     assert_eq!(vec![String::from("aaa"), String::from("bbb"), String::from("ccc")], mruby_array.concat(vec!["ccc"]).unwrap());
 /// }
 /// ```
+///
+/// By giving target type for `define_funcall!`, methods are defined only on given type.
+///
+/// ```
+/// use minutus::mruby::*;
+/// use minutus::types::*;
+/// use minutus::*;
+///
+/// struct CustomNumeric(MrbValue);
+/// impl MrbValueLike for CustomNumeric {
+///     fn mrb(&self) -> *mut minu_state {
+///         self.0.mrb()
+///     }
+///
+///     fn val(&self) -> minu_value {
+///         self.0.val()
+///     }
+/// }
+/// impl TryFromMrb for CustomNumeric {
+///     fn try_from_mrb(value: MrbValue) -> MrbResult<Self> {
+///         // You should check the value in reality!
+///         Ok(CustomNumeric(value))
+///     }
+/// }
+/// impl TryIntoMrb for CustomNumeric {
+///     fn try_into_mrb(self, _mrb: *mut minu_state) -> MrbResult<MrbValue> {
+///         Ok(self.0)
+///     }
+/// }
+///
+/// // MrbValueLike, TryFromMrb and TryIntoMrb must be implemeted for CustomNumeric
+/// define_funcall! {
+///   CustomNumeric;
+///   fn plus(&self, other: CustomNumeric) -> CustomNumeric => "+";
+///   fn inspect(&self) -> String;
+/// }
+///
+/// fn main() {
+///     let runtime = Evaluator::build();
+///     let num_1 = runtime.eval_to::<CustomNumeric>("123").unwrap();
+///     let num_2 = runtime.eval_to::<CustomNumeric>("246").unwrap();
+///     let result = num_1.plus(num_2).unwrap().inspect().unwrap();
+///     assert_eq!("369", result);
+///
+///     let mrb_value = runtime.evaluate("111").unwrap();
+///     // This does not compile.
+///     // mrb_value.plus(num_2)
+/// }
+/// ```
 pub use minutus_macros::define_funcall;
 
 /// Define methods for [DataPtr][`data::DataPtr`].
