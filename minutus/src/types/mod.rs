@@ -81,8 +81,8 @@ impl MrbValue {
     /// let inspected: String = int_123.call("inspect", ()).unwrap();
     /// assert_eq!("123", inspected);
     ///
-    /// let inspected: i64 = int_123.call("+", (100,)).unwrap();
-    /// assert_eq!(223, inspected);
+    /// let plus_result: i64 = int_123.call("+", (100,)).unwrap();
+    /// assert_eq!(223, plus_result);
     /// ```
     pub fn call<ARGS: IntoArgs, RETVAL: TryFromMrb>(
         &self,
