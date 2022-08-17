@@ -1,23 +1,22 @@
 use crate::mruby::*;
 use crate::types::*;
 
-/// Holds mrb_state and evaluates mruby codes.
+/// Evaluates mruby codes.
 ///
 /// # Example
 ///
 /// ```
-/// minutus::define_funcall!{
-///   fn concat(&self, other: Vec<i64>) -> Vec<i64> => "+";
-/// }
+/// use minutus::types::*;
 ///
-/// fn main() {
-///     let runtime = minutus::Evaluator::build();
-///     // prints [1,2,3] and returns `MrbValue` which holds `[1,2,3]`
-///     let array = runtime.evaluate("p [1,2,3]").unwrap();
-///     // `concat` returns Vec<i64> because of the `define_funcall` definition.
-///     let concat_array = array.concat(vec![4,5,6]).unwrap();
-///     assert_eq!(vec![1,2,3,4,5,6], concat_array);
-/// }
+/// let runtime = minutus::Evaluator::build();
+/// // prints [1,2,3] and returns `MrbValue` which holds `[1,2,3]`
+/// let mruby_array = runtime.evaluate("p [1,2,3]").unwrap();
+/// let array = <Vec<i64>>::try_from_mrb(mruby_array).unwrap();
+/// assert_eq!(vec![1,2,3], array);
+///
+/// // evaluates script and returns the value as String
+/// let evaluated_string = runtime.eval_to::<String>("'this is mruby string!'").unwrap();
+/// assert_eq!("this is mruby string!", evaluated_string);
 /// ```
 pub struct Evaluator {
     mrb: *mut minu_state,
@@ -41,8 +40,13 @@ impl Evaluator {
         self.mrb
     }
 
-    /// Evaluates `script` in mruby world, and returns the last value.
-    pub fn evaluate(&self, script: &str) -> Result<MrbValue, String> {
+    /// Evaluates `script` in mruby world, and returns the last evaluated value.
+    pub fn evaluate(&self, script: &str) -> MrbResult<MrbValue> {
+        self.eval_to::<MrbValue>(script)
+    }
+
+    /// Evaluates `script` in mruby world, and converts the last evaluated value into the specified type.
+    pub fn eval_to<RETVAL: TryFromMrb>(&self, script: &str) -> MrbResult<RETVAL> {
         use crate::types::*;
 
         unsafe {
@@ -53,13 +57,11 @@ impl Evaluator {
                 let inspected_exception =
                     minu_inspect(self.mrb, minu_obj_value((*self.mrb).exc as _));
                 let msg = String::try_from_mrb(MrbValue::new(self.mrb, inspected_exception))
-                    .expect(
-                        "Failed to convert the inspection result on the raised exception to String",
-                    );
-                return Err(msg);
+                    .expect("Failed to convert a exception into String");
+                return Err(MrbConversionError { msg });
             }
 
-            Ok(MrbValue::new(self.mrb, retval))
+            RETVAL::try_from_mrb(MrbValue::new(self.mrb, retval))
         }
     }
 }
