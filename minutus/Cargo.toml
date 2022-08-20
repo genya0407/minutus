@@ -1,6 +1,6 @@
 [package]
 name = "minutus"
-version = "0.3.2"
+version = "0.4.0"
 edition = "2021"
 license = "MIT"
 authors = ["Yusuke Sangenya <longinus.eva@gmail.com>"]
@@ -20,7 +20,7 @@ tar = "0.4.38"
 flate2 = "1.0.24"
 
 [dependencies]
-minutus-macros = { version = "0.3.0", path = "../minutus-macros" }
+minutus-macros = { version = "0.4.0", path = "../minutus-macros" }
 minutus-mruby-build-utils = { version = "0.3.2-alpha.1", path = "../minutus-mruby-build-utils" }
 
 [features]
