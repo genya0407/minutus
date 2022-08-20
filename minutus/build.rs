@@ -72,11 +72,18 @@ fn main() -> Result<()> {
     println!("cargo:rerun-if-changed=src/bridge");
     println!("cargo:rerun-if-changed=build.rs");
 
+    let out_dir = env::var("OUT_DIR")?;
+    let build_config_copy = Path::new(&out_dir).join("build_config.rb");
+    std::fs::copy(
+        &env::current_dir()?.join("build_config.rb"),
+        &build_config_copy,
+    )?;
+
     let do_link = env::var("CARGO_FEATURE_LINK_MRUBY").is_ok();
     MRubyManager::new()
         .mruby_version(&mruby_version())
         .link(do_link)
-        .build_config(&env::current_dir()?.join("build_config.rb"))
+        .build_config(&build_config_copy)
         .run();
     compile_bridge()?;
 
