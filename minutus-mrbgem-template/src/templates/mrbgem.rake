@@ -14,4 +14,6 @@ MRuby::Gem::Specification.new('{{ mrbgem_name }}') do |spec|
   if RbConfig::CONFIG['host_os'].downcase.include?('darwin')
     spec.linker.flags << '-framework CoreFoundation'
   end
+
+  spec.add_dependency 'mruby-error'
 end
