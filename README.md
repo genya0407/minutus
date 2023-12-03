@@ -18,10 +18,12 @@ and [wrap rust structs in mruby objects](#wrap-rust-structs-in-mruby-objects).
 
 ## Embed mruby in Rust
 
-Add minutus to your crate's dependencies.
+You can embed mruby code in Rust code.
+
+Add minutus to your crate's dependencies with `link_mruby` feature.
 
 ```shell-session
-cargo add minutus --features mruby_3_1_0,link_mruby
+cargo add minutus --features link_mruby
 ```
 
 Write code like:
@@ -29,7 +31,7 @@ Write code like:
 ```rust
 // src/main.rs
 
-// This enables you to call `some_method` from Rust world.
+// This enables you to call `some_method` in mruby world.
 minutus::define_funcall!{
   fn some_method(self, arr: Vec<i64>) -> i64;
 }
@@ -37,7 +39,7 @@ minutus::define_funcall!{
 fn main() {
     let runtime = minutus::Evaluator::build();
 
-    // define `some_method` in mruby world
+    // Define `some_method` in mruby world
     runtime.evaluate(
       "
       def some_method(arr)
@@ -47,11 +49,11 @@ fn main() {
       "
     ).unwrap();
 
-    // capture mruby's main object
+    // Capture mruby's main object
     let main = runtime.evaluate("self").unwrap();
 
-    // call `some_method` on main object from Rust world.
-    // in / out values are type-casted, according to `define_funcall!` definition
+    // Call `some_method` on main object.
+    // Arguments and return values are automatically type-casted according to `define_funcall!` definition.
     let retval: i64 = main.some_method(vec![1,2,3,4]).unwrap();
     println!("retval is {}", retval);
 }
@@ -61,9 +63,8 @@ Then, you can run your code:
 
 ```shell-session
 $ cargo run
-...
-[1, 2, 3, 4]
-retval is 10
+[1, 2, 3, 4] // in mruby workd
+retval is 10 // in rust world
 ```
 
 If you want to use custom `build_config.rb` (e.g. for using mrbgems),
