@@ -3,10 +3,11 @@ name = "custom-mruby"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+# workaround ignoring minutus's workspace
+[workspace]
 
 [build-dependencies]
 minutus = { path = "../../minutus" }
 
 [dependencies]
-minutus = { path = "../../minutus", features = ["mruby_3_1_0"]  }
+minutus = { path = "../../minutus", features = ["mruby_3_2_0"]  }

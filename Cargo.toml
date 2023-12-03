@@ -6,7 +6,7 @@ publish = []
 
 [dependencies]
 doc-comment = "0.*"
-minutus = { path = "minutus", features = ["link_mruby"] }
+minutus = { path = "minutus", features = ["mruby_3_2_0", "link_mruby"] }
 
 # workspace settings
 

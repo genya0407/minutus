@@ -3,4 +3,5 @@ MRuby::Build.new do |conf|
   
   conf.gembox 'default'
   conf.gem github: 'matsumoto-r/mruby-mrbgem-template'
+  conf.gem core: 'mruby-error'
 end

@@ -93,8 +93,8 @@ fn main() -> Result<()> {
 }
 
 fn mruby_version() -> String {
-    let default = "3.1.0";
-    let supported_versions = &["3.1.0", "MASTER"];
+    let default = "3.2.0";
+    let supported_versions = &["3.1.0", "3.2.0", "MASTER"];
     for version in supported_versions.into_iter() {
         if env::var(format!(
             "CARGO_FEATURE_MRUBY_{}",

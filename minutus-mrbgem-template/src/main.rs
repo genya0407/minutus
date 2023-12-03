@@ -47,7 +47,7 @@ fn main(
     author: Option<String>,
 
     /// Set target mruby version
-    #[opt(short, long, default_value = "3.1.0")]
+    #[opt(short, long, default_value = "3.2.0")]
     mruby_version: String,
 
     /// Set and generate binary tools
