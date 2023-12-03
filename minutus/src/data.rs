@@ -53,7 +53,7 @@ pub trait MrbData: Sized {
     fn try_into_mrb_data(self, mrb: *mut minu_state) -> MrbResult<MrbValue> {
         let size = std::mem::size_of::<Self>();
         unsafe {
-            let mem = minu_malloc(mrb, size as u64) as *mut Self;
+            let mem = minu_malloc(mrb, size) as *mut Self;
             core::ptr::write(mem, self);
             let rdata = minu_data_object_alloc(
                 mrb,

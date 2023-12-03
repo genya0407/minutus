@@ -161,7 +161,7 @@ fn compile_bridge() -> Result<()> {
         .allowlist_function(allowlist_functions.join("|"))
         .layout_tests(false)
         .generate_comments(false)
-        .parse_callbacks(Box::new(bindgen::CargoCallbacks))
+        .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()))
         .generate()?;
     bindings.write_to_file(out_path)?;
 
