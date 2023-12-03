@@ -84,7 +84,7 @@ pub fn generate_class_initializer(
 ) -> proc_macro::TokenStream {
     use crate::name_generator::*;
 
-    let attr_args = parse_macro_input!(attr as syn::AttributeArgs);
+    let attr_args = darling::ast::NestedMeta::parse_meta_list(attr.into()).unwrap();
     let wrap_attributes = WrapAttributes::from_list(&attr_args).unwrap();
     let class_method_initializer_ident: Vec<_> = wrap_attributes
         .class_method

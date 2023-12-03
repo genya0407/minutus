@@ -8,11 +8,11 @@ description = "Procedural macro definitions for minutus"
 repository = "https://github.com/genya0407/minutus"
 
 [dependencies]
-darling = "0.14.1"
-proc-macro2 = "1.0.42"
-quote = "1.0.20"
-syn = { version = "1.0.98", features = ["full", "extra-traits"] }
-convert_case = "0.5.0"
+darling = "0.*"
+proc-macro2 = "1.*"
+quote = "1.*"
+syn = { version = "1.*", features = ["full", "extra-traits"] }
+convert_case = "0.*"
 
 [lib]
 proc-macro = true

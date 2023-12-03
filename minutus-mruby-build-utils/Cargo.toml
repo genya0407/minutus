@@ -8,9 +8,9 @@ description = "Build utilities for minutus"
 repository = "https://github.com/genya0407/minutus"
 
 [dependencies]
-anyhow = "1.0.60"
-bytes = "1.2.1"
-tar = "0.4.38"
-reqwest = { version = "0.11.11", features = ["blocking"] }
-flate2 = "1.0.24"
-cc = "1.0"
+anyhow = "1.*"
+bytes = "1.*"
+tar = "0.*"
+reqwest = { version = "0.*", features = ["blocking"] }
+flate2 = "1.*"
+cc = "1.*"
