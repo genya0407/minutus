@@ -15,8 +15,8 @@ minutus = { version = "0.4.0", path = "../minutus", features = ["mruby_3_1_0"] }
 [dependencies]
 minutus = { version = "0.4.0", path = "../minutus", features = ["mruby_3_1_0"] }
 maplit = "1.*"
-argopt = "0.*"
-convert_case = "0.*"
+argopt = "0.3.0"
+convert_case = "0.6.0"
 anyhow = "1.*"
 tera = "1.*"
 lazy_static = "1.*"
