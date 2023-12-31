@@ -54,15 +54,18 @@ jobs:
   minutus-mrbgem-template:
     name: run spec on minutus-mrbgem-template
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        script:
+          - ./test.sh
+          - ./test_with_dependency.sh
     steps:
       - uses: actions/checkout@v1
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.1"
-      - run: |
-          cargo clean
-          ./test.sh
-          ./test_with_dependency.sh
+      - run: cargo clean && ${{ matrix.script }}
         working-directory: minutus-mrbgem-template
 
   aggregated-ci:
