@@ -190,13 +190,19 @@ Rust's `bool` cast to mruby's `true` or `false`.
 [3.2.0](https://github.com/mruby/mruby/releases/tag/3.2.0) are supported.
 You can also use mruby's `master` branch, but it is not tested.
 
+If the version is not specified on Cargo.toml,
+the latest supported stable version is used.
+
 ```toml
 [dependencies]
-// Use 3.1.0
-minutus = { features = ["mruby_3_1_0"] }
+# Use 3.2.0
+minutus = "*"
 
-// Use master branch
-minutus = { features = ["mruby_master"] }
+# Use 3.1.0
+minutus = { version = "*", features = ["mruby_3_1_0"] }
+
+# Use master branch
+minutus = { version = "*", features = ["mruby_master"] }
 ```
 
 ## Naming
