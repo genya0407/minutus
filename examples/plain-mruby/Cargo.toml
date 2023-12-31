@@ -7,4 +7,4 @@ edition = "2021"
 [workspace]
 
 [dependencies]
-minutus = { path = "../../minutus", features = ["mruby_3_2_0", "link_mruby"] }
+minutus = { path = "../../minutus", features = ["link_mruby"] }
