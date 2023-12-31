@@ -193,7 +193,7 @@ You can also use mruby's `master` branch, but it is not tested.
 ```toml
 [dependencies]
 // Use 3.1.0
-minutus = { features = ["mruby_3.1.0"] }
+minutus = { features = ["mruby_3_1_0"] }
 
 // Use master branch
 minutus = { features = ["mruby_master"] }
