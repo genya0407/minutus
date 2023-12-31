@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-minutus = { path = "../../minutus", features = ["mruby_3_1_0"] }
+minutus = { path = "../../minutus", features = ["mruby_3_2_0"] }
 polars = "0.23.1"
 
 [lib]

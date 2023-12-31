@@ -9,4 +9,4 @@ edition = "2021"
 minutus = { path = "../../minutus" }
 
 [dependencies]
-minutus = { path = "../../minutus", features = ["mruby_3_1_0"]  }
+minutus = { path = "../../minutus", features = ["mruby_3_2_0"]  }
