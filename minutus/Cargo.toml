@@ -13,10 +13,10 @@ readme = "../README.md"
 [build-dependencies]
 minutus-mruby-build-utils = { version = "0.3.2-alpha.1", path = "../minutus-mruby-build-utils" }
 anyhow = "1.*"
-bindgen = "0.*"
+bindgen = "0.69.1"
 cc = "1.*"
 bytes = "1.*"
-tar = "0.*"
+tar = "0.4.40"
 flate2 = "1.*"
 
 [dependencies]

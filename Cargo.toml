@@ -5,7 +5,7 @@ version = "0.3.2"
 publish = []
 
 [dependencies]
-doc-comment = "0.*"
+doc-comment = "0.3.3"
 minutus = { path = "minutus", features = ["mruby_3_2_0", "link_mruby"] }
 
 # workspace settings
