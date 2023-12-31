@@ -31,7 +31,7 @@ jobs:
           CODE
 
   examples:
-    name: run all integration tests
+    name: run specs on examples
     runs-on: ubuntu-latest
     needs: generate-example-matrix
     strategy:
@@ -45,3 +45,17 @@ jobs:
           ruby-version: "3.1"
       - run: rake test
         working-directory: ${{ matrix.example }}
+
+  minutus-mrbgem-template:
+    name: run spec on minutus-mrbgem-template
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.1"
+      - run: |
+          cargo clean
+          ./test.sh
+          ./test_with_dependency.sh
+        working-directory: minutus-mrbgem-template
