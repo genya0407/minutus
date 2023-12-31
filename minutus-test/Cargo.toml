@@ -5,5 +5,5 @@ edition = "2021"
 publish = []
 
 [dependencies]
-minutus = { path = "../minutus", features = ["link_mruby"] }
+minutus = { path = "../minutus", features = ["mruby_3_2_0", "link_mruby"] }
 regex = "1"
