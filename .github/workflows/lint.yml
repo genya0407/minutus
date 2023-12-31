@@ -1,6 +1,6 @@
 name: Lint
 
-on: [push, pull_request]
+on: pull_request
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -10,5 +10,5 @@ jobs:
       - name: Lint README.md
         uses: avto-dev/markdown-lint@v1
         with:
-          args: 'README.md'
-          config: '.markdownlint.config.json'
+          args: "README.md"
+          config: ".markdownlint.config.json"
