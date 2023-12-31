@@ -29,9 +29,9 @@ jobs:
       - name: make values
         id: set-matrix
         run: |
-          ruby -e <<CODE >> $GITHUB_OUTPUT
+          cat <<CODE | ruby >> $GITHUB_OUTPUT
             require 'json'
-            puts "examples=#{JSON.generate(Dir.glob('examples/*''))}"
+            puts "examples=#{JSON.generate(Dir.glob('examples/*'))}"
           CODE
 
   examples:
