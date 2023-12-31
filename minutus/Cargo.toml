@@ -1,6 +1,6 @@
 [package]
 name = "minutus"
-version = "0.4.0"
+version = "0.5.0"
 edition = "2021"
 license = "MIT"
 authors = ["Yusuke Sangenya <longinus.eva@gmail.com>"]
@@ -11,7 +11,7 @@ categories = ["api-bindings", "development-tools::ffi"]
 readme = "../README.md"
 
 [build-dependencies]
-minutus-mruby-build-utils = { version = "0.3.2-alpha.1", path = "../minutus-mruby-build-utils" }
+minutus-mruby-build-utils = { version = "0.5.0", path = "../minutus-mruby-build-utils" }
 anyhow = "1.*"
 bindgen = "0.69.1"
 cc = "1.*"
@@ -20,8 +20,8 @@ tar = "0.4.40"
 flate2 = "1.*"
 
 [dependencies]
-minutus-macros = { version = "0.4.0", path = "../minutus-macros" }
-minutus-mruby-build-utils = { version = "0.3.2-alpha.1", path = "../minutus-mruby-build-utils" }
+minutus-macros = { version = "0.5.0", path = "../minutus-macros" }
+minutus-mruby-build-utils = { version = "0.5.0", path = "../minutus-mruby-build-utils" }
 
 [features]
 mruby_3_1_0 = []
