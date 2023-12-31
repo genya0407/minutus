@@ -18,7 +18,7 @@ task :compile => :mruby do
 end
 
 desc "test"
-task :test => :mruby do
+task :test => [:mruby, :clean] do
   sh "cd mruby && rake all test MRUBY_CONFIG=#{MRUBY_CONFIG}"
 end
 
