@@ -186,8 +186,18 @@ Rust's `bool` cast to mruby's `true` or `false`.
 
 ## Supported mruby versions
 
-Currently, only [3.1.0](https://github.com/mruby/mruby/releases/tag/3.1.0) is supported.
-You can use `mruby_master` feature, but it is not guaranteed to work.
+[3.1.0](https://github.com/mruby/mruby/releases/tag/3.1.0) and
+[3.2.0](https://github.com/mruby/mruby/releases/tag/3.2.0) are supported.
+You can also use mruby's `master` branch, but it is not tested.
+
+```toml
+[dependencies]
+// Use 3.1.0
+minutus = { features = ["mruby_3.1.0"] }
+
+// Use master branch
+minutus = { features = ["mruby_master"] }
+```
 
 ## Naming
 

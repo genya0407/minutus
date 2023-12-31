@@ -1,8 +1,6 @@
 use anyhow::{anyhow, Result};
 use std::path::{Path, PathBuf};
 
-const DEFAULT_MRUBY_VERSION: &'static str = "3.1.0";
-
 /// Helper for building and linking libmruby.
 pub struct MRubyManager {
     workdir: Option<PathBuf>,
@@ -31,7 +29,7 @@ impl MRubyManager {
         self
     }
 
-    /// Set mruby version. The default is `"3.1.0"`.
+    /// Set mruby version.
     pub fn mruby_version(mut self, mruby_version: &str) -> Self {
         self.mruby_version = Some(mruby_version.to_string());
         self
@@ -71,10 +69,10 @@ impl MRubyManager {
         let mruby_version = self
             .mruby_version
             .map(String::from)
-            .unwrap_or(DEFAULT_MRUBY_VERSION.to_string());
+            .expect("mruby_version is not set.");
         let build_config = self
             .build_config
-            .unwrap_or(Path::new("default").to_path_buf()); // see: https://github.com/mruby/mruby/blob/3.1.0/doc/guides/compile.md#build
+            .unwrap_or(Path::new("default").to_path_buf()); // see: https://github.com/mruby/mruby/blob/3.2.0/doc/guides/compile.md#build
 
         if self.do_download {
             download_mruby(&workdir, &mruby_version);
@@ -164,6 +162,11 @@ fn run_command(current_dir: &Path, cmd: &[&str]) -> Result<String> {
     if output.status.success() {
         Ok(String::from_utf8_lossy(&output.stdout).to_string())
     } else {
-        Err(anyhow!(format!("Executing {:?} failed", cmd)))
+        Err(anyhow!(format!(
+            "Executing {:?} failed: {}, {}",
+            cmd,
+            String::from_utf8_lossy(&output.stdout),
+            String::from_utf8_lossy(&output.stderr)
+        )))
     }
 }
