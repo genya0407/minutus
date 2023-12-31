@@ -23,6 +23,7 @@ jobs:
     outputs:
       examples: ${{ steps.set-matrix.outputs.examples }}
     steps:
+      - uses: actions/checkout@v1
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.3"
