@@ -1,6 +1,6 @@
 MRuby::Build.new do |conf|
   conf.toolchain
-  conf.gembox 'default'
+  conf.gembox 'full-core'
   conf.enable_bintest
   conf.enable_test
 end
