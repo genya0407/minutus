@@ -10,7 +10,7 @@ repository = "https://github.com/genya0407/minutus"
 [dependencies]
 anyhow = "1.*"
 bytes = "1.*"
-tar = "0.*"
-reqwest = { version = "0.*", features = ["blocking"] }
+tar = "0.4.40"
+reqwest = { version = "0.11.23", features = ["blocking"] }
 flate2 = "1.*"
 cc = "1.*"
