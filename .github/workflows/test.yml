@@ -66,13 +66,14 @@ jobs:
       - run: cargo test --workspace
 
   cargo_test_minutus_all_versions:
-    name: cargo test minutus ${{ matrix.version }}
-    runs-on: ubuntu-latest
-    needs: generate-version-matrix
+    name: cargo test minutus ${{ matrix.version }} on ${{ matrix.runs-on }}
+    runs-on: ${{ matrix.runs-on }}
+    needs: [generate-version-matrix, generate-runs-on-matrix]
     strategy:
       fail-fast: false
       matrix:
         version: ${{ fromJson(needs.generate-version-matrix.outputs.versions) }}
+        runs-on: ${{ fromJson(needs.generate-runs-on-matrix.outputs.runs-ons) }}
     steps:
       - uses: actions/checkout@v1
       - uses: ruby/setup-ruby@v1
@@ -82,13 +83,14 @@ jobs:
         working-directory: minutus
 
   cargo_test_minutus_test_all_versions:
-    name: cargo test minutus-test for ${{ matrix.version }}
-    runs-on: ubuntu-latest
-    needs: generate-version-matrix
+    name: cargo test minutus-test for ${{ matrix.version }} on ${{ matrix.runs-on }}
+    runs-on: ${{ matrix.runs-on }}
+    needs: [generate-version-matrix, generate-runs-on-matrix]
     strategy:
       fail-fast: false
       matrix:
         version: ${{ fromJson(needs.generate-version-matrix.outputs.versions) }}
+        runs-on: ${{ fromJson(needs.generate-runs-on-matrix.outputs.runs-ons) }}
     steps:
       - uses: actions/checkout@v1
       - uses: ruby/setup-ruby@v1
@@ -117,13 +119,14 @@ jobs:
           CODE
 
   examples:
-    name: run specs on examples
-    runs-on: ubuntu-latest
-    needs: generate-example-matrix
+    name: run specs on examples on ${{ matrix.runs-on }}
+    runs-on: ${{ matrix.runs-on }}
+    needs: [generate-example-matrix, generate-runs-on-matrix]
     strategy:
       fail-fast: false
       matrix:
         example: ${{ fromJson(needs.generate-example-matrix.outputs.examples) }}
+        runs-on: ${{ fromJson(needs.generate-runs-on-matrix.outputs.runs-ons) }}
     steps:
       - uses: actions/checkout@v1
       - uses: ruby/setup-ruby@v1
@@ -133,11 +136,13 @@ jobs:
         working-directory: ${{ matrix.example }}
 
   minutus-mrbgem-template:
-    name: run spec on minutus-mrbgem-template
-    runs-on: ubuntu-latest
+    name: run spec on minutus-mrbgem-template on ${{ matrix.runs-on }}
+    runs-on: ${{ matrix.runs-on }}
+    needs: [generate-example-matrix, generate-runs-on-matrix]
     strategy:
       fail-fast: false
       matrix:
+        runs-on: ${{ fromJson(needs.generate-runs-on-matrix.outputs.runs-ons) }}
         script:
           - ./test.sh
           - ./test_with_dependency.sh
