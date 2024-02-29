@@ -112,7 +112,7 @@ fn link_mruby(workdir: &Path) {
 
     // For build on environments where `-Wl,--as-needed` is the default.
     if cc::Build::new()
-        .is_flag_supported("-Wl,'--no-as-needed'")
+        .is_flag_supported("-Wl,--no-as-needed")
         .unwrap()
     {
         println!("cargo:rustc-link-arg=-Wl,--no-as-needed");
