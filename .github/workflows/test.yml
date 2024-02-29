@@ -6,16 +6,26 @@ concurrency:
 
 on: pull_request
 jobs:
-  cargo_test_workspace:
-    name: cargo test
+  generate-runs-on-matrix:
     runs-on: ubuntu-latest
-
+    outputs:
+      runs-ons: ${{ steps.set-matrix.outputs.runs-ons }}
     steps:
       - uses: actions/checkout@v1
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3"
-      - run: cargo test --workspace
+      - name: make values
+        id: set-matrix
+        run: |
+          cat <<CODE | ruby >> $GITHUB_OUTPUT
+            require 'json'
+            runs_ons = [
+              "ubuntu-latest",
+              "macos-latest",
+            ]
+            puts "runs-ons=#{JSON.generate(runs_ons)}"
+          CODE
 
   generate-version-matrix:
     runs-on: ubuntu-latest
@@ -39,6 +49,21 @@ jobs:
             ]
             puts "versions=#{JSON.generate(versions)}"
           CODE
+
+  cargo_test_workspace:
+    name: cargo test on ${{ matrix.runs-on }}
+    runs-on: ${{ matrix.runs-on }}
+    needs: generate-runs-on-matrix
+    strategy:
+      fail-fast: false
+      matrix:
+        runs-on: ${{ fromJson(needs.generate-runs-on-matrix.outputs.runs-ons) }}
+    steps:
+      - uses: actions/checkout@v1
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3"
+      - run: cargo test --workspace
 
   cargo_test_minutus_all_versions:
     name: cargo test minutus ${{ matrix.version }}
