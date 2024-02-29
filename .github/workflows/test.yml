@@ -128,7 +128,8 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       [
-        cargo_test_all_versions,
+        cargo_test_minutus_all_versions,
+        cargo_test_minutus_test_all_versions,
         cargo_test_workspace,
         minutus-mrbgem-template,
         examples,
