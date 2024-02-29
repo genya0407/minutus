@@ -1,0 +1,9 @@
+[package]
+name = "minutus-test"
+version = "0.1.0"
+edition = "2021"
+publish = []
+
+[dependencies]
+minutus = { path = "../minutus", features = ["link_mruby", "mruby_3_1_0"] }
+regex = "1"
