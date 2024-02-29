@@ -41,7 +41,7 @@ jobs:
           CODE
 
   cargo_test_minutus_all_versions:
-    name: cargo test ${{ matrix.version }}
+    name: cargo test minutus ${{ matrix.version }}
     runs-on: ubuntu-latest
     needs: generate-version-matrix
     strategy:
@@ -57,7 +57,7 @@ jobs:
         working-directory: minutus
 
   cargo_test_minutus_test_all_versions:
-    name: cargo test ${{ matrix.version }}
+    name: cargo test minutus-test for ${{ matrix.version }}
     runs-on: ubuntu-latest
     needs: generate-version-matrix
     strategy:
