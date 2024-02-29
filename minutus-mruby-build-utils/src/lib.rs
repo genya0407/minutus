@@ -111,13 +111,12 @@ fn link_mruby(workdir: &Path) {
     );
 
     // For build on environments where `-Wl,--as-needed` is the default.
-    if cc::Build::new()
-        .is_flag_supported("-Wl,--no-as-needed")
-        .unwrap()
-    {
+    let re = regex::Regex::new(r"as-needed").unwrap();
+    let as_needed_supported = re.is_match(&run_command(Path::new("."), &["ld", "--help"]).unwrap());
+    if as_needed_supported {
         println!("cargo:rustc-link-arg=-Wl,--no-as-needed");
-        println!("cargo:rustc-link-arg=-lmruby");
     }
+    println!("cargo:rustc-link-lib=mruby");
 }
 
 /// Downloads mruby source code from github.
