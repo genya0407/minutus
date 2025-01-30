@@ -127,7 +127,14 @@ fn compile_bridge() -> Result<()> {
         eprintln!("{}", String::from_utf8(output.stderr)?);
         return Err(anyhow!("Failed to execute command"));
     }
-    std::fs::write(out_dir.join("bridge.c"), output.stdout)?;
+
+    let existing_bridge = std::fs::read(out_dir.join("bridge.c"));
+    let bridge_changed = existing_bridge
+        .map(|existing_bridge| existing_bridge != output.stdout)
+        .unwrap_or(true);
+    if bridge_changed {
+        std::fs::write(out_dir.join("bridge.c"), output.stdout)?;
+    }
 
     // generate binding
     println!("Start generating binding");
