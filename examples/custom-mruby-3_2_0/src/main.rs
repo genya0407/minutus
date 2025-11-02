@@ -5,7 +5,7 @@ use std::collections::HashMap;
 fn check_mruby_version() {
     let evaluator = minutus::Evaluator::build();
     let mruby_version = String::try_from_mrb(evaluator.evaluate("MRUBY_VERSION").unwrap()).unwrap();
-    assert_eq!(mruby_version, "3.3.0");
+    assert_eq!(mruby_version, "3.2.0");
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {

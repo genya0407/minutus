@@ -13,6 +13,10 @@ jobs:
         platform:
           - ubuntu-latest
           - macos-latest
+        mruby-version:
+          - "3_1_0"
+          - "3_2_0"
+          - "3_3_0"
     runs-on: ${{ matrix.platform }}
 
     steps:
@@ -21,7 +25,9 @@ jobs:
         with:
           ruby-version: "3"
       - uses: Swatinem/rust-cache@v2
-      - run: cargo test --workspace
+      - run: |
+          cp minutus-test/cargo_tomls/${{ matrix.mruby-version }}.toml minutus-test/Cargo.toml
+          cargo test -F mruby_${{ matrix.mruby-version }} --workspace
 
   generate-example-matrix:
     runs-on: ubuntu-latest
