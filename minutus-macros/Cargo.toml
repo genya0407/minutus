@@ -8,7 +8,9 @@ description = "Procedural macro definitions for minutus"
 repository = "https://github.com/genya0407/minutus"
 
 [dependencies]
-darling = "0.20.3"
+# Since darling often introduces breaking changes on patch versions, we specify the exact version here.
+darling = "=0.21.3"
+
 proc-macro2 = "1.*"
 quote = "1.*"
 syn = { version = "1.*", features = ["full", "extra-traits"] }

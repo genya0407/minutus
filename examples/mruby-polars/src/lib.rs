@@ -44,11 +44,11 @@ impl DF {
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn mrb_mruby_polars_gem_init(mrb: *mut minutus::mruby::minu_state) {
     DataFrameBuilder::define_class_on_mrb(mrb);
     DF::define_class_on_mrb(mrb)
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn mrb_mruby_polars_gem_final(_mrb: *mut minutus::mruby::minu_state) {}
