@@ -8,6 +8,7 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 #![allow(dead_code)]
+#![allow(unnecessary_transmutes)]
 
 // types
 pub use internal::{minu_aspec, minu_bool, minu_float, minu_int, minu_state, minu_sym, minu_value};
