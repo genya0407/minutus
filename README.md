@@ -191,6 +191,7 @@ Following versions are supported:
 * [3.1.0](https://github.com/mruby/mruby/releases/tag/3.1.0)
 * [3.2.0](https://github.com/mruby/mruby/releases/tag/3.2.0)
 * [3.3.0](https://github.com/mruby/mruby/releases/tag/3.3.0)
+* [3.4.0](https://github.com/mruby/mruby/releases/tag/3.4.0)
 
 You can also use mruby's `master` branch, but it is not tested.
 
@@ -199,11 +200,11 @@ the latest supported stable version is used.
 
 ```toml
 [dependencies]
-# Use 3.3.0
+# Use 3.4.0
 minutus = "*"
 
-# Use 3.2.0
-minutus = { version = "*", features = ["mruby_3_2_0"] }
+# Use 3.3.0
+minutus = { version = "*", features = ["mruby_3_3_0"] }
 
 # Use master branch
 minutus = { version = "*", features = ["mruby_master"] }
