@@ -1,6 +1,7 @@
 # crate definition for testing README.md
 [package]
 name = "minutus-readme-test"
+edition = "2021"
 version = "0.3.2"
 publish = []
 
