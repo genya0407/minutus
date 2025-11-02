@@ -32,11 +32,11 @@ impl {{ class_name }} {
 }
 
 // mrb_{{ underscored_package_name }}_gem_init / mrb_{{ underscored_package_name }}_gem_final are recognized by mruby, and executed when this mrbgem is loaded.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn mrb_{{ underscored_package_name }}_gem_init(mrb: *mut minutus::mruby::minu_state) {
    // If you define classes, you must call `define_class_on_mrb` here to have mruby recognize the class.
    {{ class_name }}::define_class_on_mrb(mrb);
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn mrb_{{ underscored_package_name }}_gem_final(_mrb: *mut minutus::mruby::minu_state) {}        
