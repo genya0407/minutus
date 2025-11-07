@@ -259,7 +259,7 @@ Next, you can pass the specified path using the **MINUTUS_MRUBY_DIR** environmen
 env MINUTUS_MRUBY_DIR=/tmp/mruby-local-dir cargo b -rvv
 ```
 
-## Cross-Platform Support
+## Supported Platforms
 
 **minutus** primarily supports Unix-like systems.
 
