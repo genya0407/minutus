@@ -1,7 +1,6 @@
-use anyhow::{anyhow, Result};
-use std::env;
-use std::path::Path;
+use std::{env, path::Path};
 
+use anyhow::{bail, Result};
 use minutus_mruby_build_utils::MRubyManager;
 
 fn check_command(cmd: &[&str]) {
@@ -24,7 +23,7 @@ fn extract_mruby_source_code() -> Result<()> {
         .join(format!("{}.tar.gz", mruby_version()));
     if !archive_path.exists() {
         println!("cargo:warning={} does not exist", archive_path.display());
-        return Err(anyhow!("{} does not exist", archive_path.display()));
+        bail!("{archive_path:?} does not exist")
     }
 
     if workdir.join("mruby").exists() {
@@ -37,7 +36,7 @@ fn extract_mruby_source_code() -> Result<()> {
         flate2::read::GzDecoder::new(tar_gz.reader())
     };
     let mut archive = tar::Archive::new(tar);
-    archive.unpack(&workdir).unwrap();
+    archive.unpack(workdir).unwrap();
 
     std::fs::rename(
         workdir.join(format!("mruby-{}", mruby_version())),
@@ -75,7 +74,7 @@ fn main() -> Result<()> {
     let out_dir = env::var("OUT_DIR")?;
     let build_config_copy = Path::new(&out_dir).join("build_config.rb");
     std::fs::copy(
-        &env::current_dir()?.join("build_config.rb"),
+        env::current_dir()?.join("build_config.rb"),
         &build_config_copy,
     )?;
 
@@ -95,7 +94,7 @@ fn main() -> Result<()> {
 fn mruby_version() -> String {
     let default = "3.3.0";
     let supported_versions = &["3.1.0", "3.2.0", "3.3.0", "MASTER"];
-    for version in supported_versions.into_iter() {
+    for version in supported_versions {
         if env::var(format!(
             "CARGO_FEATURE_MRUBY_{}",
             str::replace(version, ".", "_")
@@ -105,7 +104,7 @@ fn mruby_version() -> String {
             return version.to_lowercase().to_string();
         }
     }
-    return default.to_string();
+    default.to_string()
 }
 
 fn compile_bridge() -> Result<()> {
@@ -113,7 +112,7 @@ fn compile_bridge() -> Result<()> {
     let out_dir = Path::new(&out_dir);
     // generate bridge.c
     let output = std::process::Command::new("ruby")
-        .args(&["all.rb"])
+        .args(["all.rb"])
         .current_dir(Path::new("src").join("bridge"))
         .output();
     let output = match output {
@@ -125,7 +124,7 @@ fn compile_bridge() -> Result<()> {
     };
     if !output.status.success() {
         eprintln!("{}", String::from_utf8(output.stderr)?);
-        return Err(anyhow!("Failed to execute command"));
+        bail!("Failed to execute command")
     }
 
     let existing_bridge = std::fs::read(out_dir.join("bridge.c"));
