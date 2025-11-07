@@ -108,6 +108,7 @@ fn copy_to_mruby_outdir(
     out_dir: &str,
 ) -> fs_extra::error::Result<u64> {
     use fs_extra::dir::{copy as copy_dir, CopyOptions};
+
     let opts = CopyOptions::new().overwrite(true);
     println!("cargo:warning=local mruby dir: {local_dir}");
 
@@ -120,8 +121,12 @@ fn copy_to_mruby_outdir(
         .file_name()
         .ok_or_else(|| io::Error::other("Failed to get local_dir.file_name"))?;
 
-    println!("cargo:warning=local dir name: {dir_name:?}");
-    fs::rename(out_path.join(dir_name), out_path.join("mruby"))?;
+    println!("cargo:warning=out_dir: {out_dir}");
+
+    fs::rename(out_path.join(dir_name), out_path.join("mruby")) //
+        .inspect_err(|e| {
+            println!("cargo:warning=Failed to rename to mruby;\n Err: {e}")
+        })?;
     status
 }
 
