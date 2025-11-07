@@ -194,6 +194,8 @@ Following versions are supported:
 
 You can also use mruby's `master` branch, but it is not tested.
 
+If you need to customize a specific version (such as a specific tag), you can do so via `mruby_dir`. See "Local Dir" for details.
+
 If the version is not specified on Cargo.toml,
 the latest supported stable version is used.
 
@@ -208,6 +210,60 @@ minutus = { version = "*", features = ["mruby_3_2_0"] }
 # Use master branch
 minutus = { version = "*", features = ["mruby_master"] }
 ```
+
+### Local Dir
+
+Use a local directory instead of a remote Git repository.
+
+```toml
+# Cargo.toml
+#
+[dependencies]
+minutus = { version = "*", features = ["mruby_dir"] }
+```
+
+#### Example
+
+```shell
+# POSIX-sh
+#
+cd /tmp
+tag="240412a29080f775fabf97e56fc158b7249367e1"
+curl -Lfo mruby.tgz "https://github.com/mruby/mruby/archive/${tag}.tar.gz"
+
+tar -xf mruby.tgz
+mv mruby-$tag mruby-local-dir
+```
+
+**build:**
+
+Modify your project's `Rakefile`.
+
+```ruby
+# Rakefile
+#
+file :mruby do
+  #sh "git clone --depth=1 https://github.com/mruby/mruby.git"
+  local_dir = "/tmp/mruby-local-dir"
+  unless Dir.exist?("mruby")
+    FileUtils.cp_r(local_dir, "mruby")
+  end
+  # ...
+```
+
+Next, you can pass the specified path using the **MINUTUS_MRUBY_DIR** environment variable.
+
+```sh
+# POSIX-sh
+#
+env MINUTUS_MRUBY_DIR=/tmp/mruby-local-dir cargo b -rvv
+```
+
+## Cross-Platform Support
+
+**minutus** primarily supports Unix-like systems.
+
+If you encounter issues in a Windows MSVC environment, try using **msys2** and the `*-pc-windows-gnu` target.
 
 ## Naming
 
