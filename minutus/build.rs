@@ -103,11 +103,31 @@ fn main() -> Result<()> {
     Ok(())
 }
 
+fn dir_is_not_empty<P: AsRef<Path>>(path: P) -> bool {
+    fs::read_dir(path)
+        .ok()
+        .and_then(|mut entries| entries.next())
+        .is_some()
+}
+
 fn copy_to_mruby_outdir(
     local_dir: &str,
     out_dir: &str,
 ) -> fs_extra::error::Result<u64> {
     use fs_extra::dir::{copy as copy_dir, CopyOptions};
+
+    let out_path = Path::new(out_dir);
+    let mruby_dir = out_path.join("mruby");
+
+    if mruby_dir.exists() {
+        match dir_is_not_empty(&mruby_dir) {
+            true => {
+                println!("cargo:warning=Dir exists: {mruby_dir:?}");
+                return Ok(0);
+            }
+            _ => fs::remove_dir_all(&mruby_dir)?,
+        }
+    }
 
     let opts = CopyOptions::new().overwrite(true);
     println!("cargo:warning=local mruby dir: {local_dir}");
@@ -115,7 +135,6 @@ fn copy_to_mruby_outdir(
     let status = copy_dir(local_dir, out_dir, &opts).inspect_err(|e| {
         println!("cargo:warning=Failed to copy dir;\n outdir: {out_dir};\n Err: {e}")
     });
-    let out_path = Path::new(out_dir);
 
     let dir_name = Path::new(local_dir)
         .file_name()
@@ -123,7 +142,7 @@ fn copy_to_mruby_outdir(
 
     println!("cargo:warning=out_dir: {out_dir}");
 
-    fs::rename(out_path.join(dir_name), out_path.join("mruby")) //
+    fs::rename(out_path.join(dir_name), mruby_dir) //
         .inspect_err(|e| {
             println!("cargo:warning=Failed to rename to mruby;\n Err: {e}")
         })?;
