@@ -1,4 +1,4 @@
-use std::{env, fs, io, path::Path};
+use std::{env, fs, path::Path};
 
 use anyhow::{bail, Result};
 use minutus_mruby_build_utils::MRubyManager;
@@ -78,75 +78,30 @@ fn main() -> Result<()> {
         &build_config_copy,
     )?;
 
-    let do_link = env::var("CARGO_FEATURE_LINK_MRUBY").is_ok();
-    let do_download = match env::var("CARGO_FEATURE_MRUBY_DIR") {
-        Err(_) => true,
-        _ => match env::var("MINUTUS_MRUBY_DIR") {
-            Ok(dir) if dir.trim().is_empty() => true,
-            // copy_dir ok => No need to download.
-            // copy_dir err => need to download.
-            Ok(dir) => copy_to_mruby_outdir(&dir, &out_dir).is_err(),
-            _ => true,
-        },
-    };
-
-    MRubyManager::new()
-        .mruby_version(&mruby_version())
-        .link(do_link)
-        .build_config(&build_config_copy)
-        .download(do_download)
-        .run();
+    init_mruby_manager(&build_config_copy)?.run();
     compile_bridge()?;
-
     println!("Finish build.rs");
 
     Ok(())
 }
 
-fn dir_is_not_empty<P: AsRef<Path>>(path: P) -> bool {
-    fs::read_dir(path)
-        .ok()
-        .and_then(|mut entries| entries.next())
-        .is_some()
-}
+fn init_mruby_manager(build_config_copy: &Path) -> Result<MRubyManager> {
+    let do_link = env::var("CARGO_FEATURE_LINK_MRUBY").is_ok();
 
-fn copy_to_mruby_outdir(
-    local_dir: &str,
-    out_dir: &str,
-) -> fs_extra::error::Result<u64> {
-    use fs_extra::dir::{copy as copy_dir, CopyOptions};
+    let mut manager = MRubyManager::new() // We cannot provide proper `mruby_version` if mruby_dir feature is used.
+        .link(do_link)
+        .build_config(build_config_copy);
 
-    let out_path = Path::new(out_dir);
-    let mruby_dir = out_path.join("mruby");
+    manager = if env::var("CARGO_FEATURE_MRUBY_DIR").is_ok() {
+        let mruby_dir = env::var("MINUTUS_MRUBY_DIR")?;
+        manager
+            .download(false)
+            .copy_mruby_from(mruby_dir)
+    } else {
+        manager.mruby_version(&mruby_version())
+    };
 
-    if mruby_dir.exists() {
-        match dir_is_not_empty(&mruby_dir) {
-            true => {
-                println!("cargo:warning=Dir exists: {mruby_dir:?}");
-                return Ok(0);
-            }
-            _ => fs::remove_dir_all(&mruby_dir)?,
-        }
-    }
-
-    let opts = CopyOptions::new().overwrite(true);
-    println!("cargo:warning=local mruby dir: {local_dir}");
-
-    let status = copy_dir(local_dir, out_dir, &opts).inspect_err(|e| {
-        println!("cargo:warning=Failed to copy dir;\n outdir: {out_dir};\n Err: {e}")
-    });
-
-    let dir_name = Path::new(local_dir)
-        .file_name()
-        .ok_or_else(|| io::Error::other("Failed to get local_dir.file_name"))?;
-
-    println!("cargo:warning=out_dir: {out_dir}");
-
-    fs::rename(out_path.join(dir_name), mruby_dir) //
-        .inspect_err(|e| {
-            println!("cargo:warning=Failed to rename to mruby;\n Err: {e}")
-        })?;
-    status
+    Ok(manager)
 }
 
 fn mruby_version() -> String {

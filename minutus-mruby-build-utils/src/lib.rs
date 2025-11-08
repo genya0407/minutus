@@ -2,6 +2,8 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{bail, Result};
 
+mod mruby_dir;
+
 /// Helper for building and linking libmruby.
 #[derive(Debug)]
 pub struct MRubyManager {
@@ -10,6 +12,7 @@ pub struct MRubyManager {
     do_link: bool,
     build_config: Option<PathBuf>,
     do_download: bool,
+    copy_mruby_from: Option<PathBuf>,
 }
 
 impl Default for MRubyManager {
@@ -20,6 +23,7 @@ impl Default for MRubyManager {
             do_link: true,
             build_config: None,
             do_download: true,
+            copy_mruby_from: None,
         }
     }
 }
@@ -50,6 +54,18 @@ impl MRubyManager {
         self
     }
 
+    /// Set custom `mruby_dir`
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// MRubyManager::new().copy_mruby_from("/path/to/mruby-src-dir").run()
+    /// ```
+    pub fn copy_mruby_from<P: Into<PathBuf>>(mut self, path: P) -> Self {
+        self.copy_mruby_from = Some(path.into());
+        self
+    }
+
     /// Whether the builder should build/link `libmruby.a` or not. The default is
     /// `true`.
     ///
@@ -74,18 +90,29 @@ impl MRubyManager {
     /// Run the task.
     pub fn run(self) {
         let workdir = self.workdir.unwrap_or_else(|| {
-            let out_dir = std::env::var("OUT_DIR")
-                .expect(r#"Could not fetch "OUT_DIR" environment variable."#);
-            Path::new(&out_dir).to_path_buf()
+            std::env::var("OUT_DIR")
+                .expect(r#"Could not fetch "OUT_DIR" environment variable."#)
+                .into()
         });
-        let mruby_version = self.mruby_version.expect("mruby_version is not set.");
+
         let build_config = self
             .build_config
-            .unwrap_or(Path::new("default").to_path_buf()); // see: https://github.com/mruby/mruby/blob/3.2.0/doc/guides/compile.md#build
+            .unwrap_or_else(|| "default".into()); // see: https://github.com/mruby/mruby/blob/3.2.0/doc/guides/compile.md#build
 
         if self.do_download {
+            let mruby_version = self
+                .mruby_version
+                .expect("mruby_version is not set.");
+
             download_mruby(&workdir, &mruby_version);
         }
+
+        if let Some(src_dir) = self.copy_mruby_from {
+            mruby_dir::copy_to_mruby_dir(&src_dir, &workdir).unwrap_or_else(|_| {
+        panic!("Failed to copy dir. src: {src_dir:?}, target: {workdir:?}/mruby")
+      });
+        }
+
         build_mruby(&workdir, &build_config);
 
         if self.do_link {
@@ -95,12 +122,7 @@ impl MRubyManager {
 }
 
 fn build_mruby(workdir: &Path, path: &Path) {
-    let rake = match () {
-        #[cfg(windows)]
-        () => "rake.bat",
-        #[cfg(not(windows))]
-        _ => "rake",
-    };
+    let rake = if cfg!(windows) { "rake.bat" } else { "rake" };
 
     let c = &[
         rake,
@@ -121,23 +143,23 @@ fn link_mruby(workdir: &Path) {
     #[allow(unreachable_patterns)]
     let mruby_config = match mrb_cfg_bin {
         #[cfg(windows)]
-        p => ["bat", "exe"]
-            .iter()
-            .map(|ext| p.with_extension(ext))
-            .find(|x| x.exists()),
+        p => Some(p.with_extension("bat")).filter(|x| x.exists()),
         #[cfg(not(windows))]
         p if p.exists() => Some(p),
         _ => None,
     }
-    .expect("The mruby-config file does not exist!");
+    .expect(r#"The `mruby-config` executable file does not exist!"#);
 
     let ldflags_before_libs = run_command(
         workdir,
         &[mruby_config.to_str().unwrap(), "--ldflags-before-libs"],
     )
     .unwrap();
-    let ldflags = run_command(workdir, &[mruby_config.to_str().unwrap(), "--ldflags"]).unwrap();
-    let libs = run_command(workdir, &[mruby_config.to_str().unwrap(), "--libs"]).unwrap();
+    let ldflags =
+        run_command(workdir, &[mruby_config.to_str().unwrap(), "--ldflags"])
+            .unwrap();
+    let libs =
+        run_command(workdir, &[mruby_config.to_str().unwrap(), "--libs"]).unwrap();
     println!(
         "cargo:rustc-flags={} {} {}",
         ldflags_before_libs.trim(),
@@ -153,9 +175,13 @@ pub fn download_mruby(workdir: &Path, mruby_version: &str) {
     }
 
     let url = match mruby_version {
-        "master" => "https://github.com/mruby/mruby/archive/refs/heads/master.tar.gz".into(),
+        "master" => {
+            "https://github.com/mruby/mruby/archive/refs/heads/master.tar.gz".into()
+        }
         _ => {
-            format!("https://github.com/mruby/mruby/archive/refs/tags/{mruby_version}.tar.gz")
+            format!(
+        "https://github.com/mruby/mruby/archive/refs/tags/{mruby_version}.tar.gz"
+      )
         }
     };
 
