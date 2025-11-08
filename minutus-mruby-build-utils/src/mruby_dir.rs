@@ -65,13 +65,16 @@ pub(crate) fn copy_to_mruby_dir(src_dir: &Path, work_dir: &Path) -> io::Result<u
         .file_name()
         .ok_or_else(|| io::Error::other("Failed to get src_dir.file_name"))?;
 
-    // In UNIX-like `sh` ,
-    // running `cp -r /path/to/xx /out/mruby` behaves as follows:
+    // In UNIX-like systems' `sh`,
+    // running `cp -r /tmp/xx /out/mruby` behaves as follows:
     //
-    // - 1. If the `mruby` directory does not exist, `xx` will be renamed to `mruby`
-    //   implicitly.
-    // - 2. If the `mruby` directory exists, the `xx` directory will be copied into
-    //   `/out/mruby/xx`.
+    // - 1. If the `mruby` directory does not exist, the contents of `xx` will be
+    //   copied into a newly created directory named `mruby` automatically.
+    //  (/tmp/xx => /out/mruby)
+    //
+    // - 2. If the `mruby` directory exists, the directory xx will be copied into
+    //   /out/mruby/ as a subdirectory.
+    //  (/tmp/xx => /out/mruby/xx)
     //
     // The behavior of `fs_extra::dir::copy` is closer to the 2nd case:
     // it assumes the destination directory already exists.

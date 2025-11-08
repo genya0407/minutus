@@ -88,7 +88,8 @@ fn main() -> Result<()> {
 fn init_mruby_manager(build_config_copy: &Path) -> Result<MRubyManager> {
     let do_link = env::var("CARGO_FEATURE_LINK_MRUBY").is_ok();
 
-    let mut manager = MRubyManager::new() // We cannot provide proper `mruby_version` if mruby_dir feature is used.
+    let mut manager = MRubyManager::new()
+        // We cannot provide proper `mruby_version` if mruby_dir feature is used.
         .link(do_link)
         .build_config(build_config_copy);
 
