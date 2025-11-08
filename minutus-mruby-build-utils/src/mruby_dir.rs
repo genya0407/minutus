@@ -20,7 +20,9 @@ fn dir_is_not_empty<P: AsRef<Path>>(path: P) -> bool {
 }
 
 fn try_to_copy_dir(from: &Path, to: &Path) -> io::Result<u64> {
-    let opts = CopyOptions::new().overwrite(true);
+    let opts = CopyOptions::new()
+        .overwrite(true)
+        .copy_inside(true);
 
     copy_dir(from, to, &opts).map_err(|e| {
         let err_msg = format!(
@@ -43,13 +45,32 @@ fn try_to_copy_dir(from: &Path, to: &Path) -> io::Result<u64> {
 /// // src_dir => "{work_dir}/mruby"
 /// copy_to_mruby_dir(src_dir, &work_dir)?;
 /// ```
+///
+/// # Returns
+///
+/// This function returns either `io::ErrorKind::Other(msg)` or `Ok(u64)`.
+///
+/// When returning `Ok(n)`, `n` represents the amount of data transferred (in
+/// bytes).
+///
+/// - If `n = 0`, it means an empty directory was copied.
+/// - If `n >= 1`, it indicates that a non-empty directory was transferred
+///   (copied).
+///
+/// > Note: This function uses the special return value `Ok(1)` to indicate that
+/// > `target_dir` already exists and is not empty, but the function returned
+/// > early without performing any copy operation.
 pub(crate) fn copy_to_mruby_dir(src_dir: &Path, work_dir: &Path) -> io::Result<u64> {
     let target_dir = work_dir.join("mruby");
 
     if target_dir.exists() {
         if dir_is_not_empty(&target_dir) {
             println!("cargo:warning=Dir exists: {target_dir:?}");
-            return Ok(0);
+            // Do not use Ok(0) here.
+            // Later, we might need to use Ok(n) to determine the number of bytes copied.
+            // In some cases, OK(0) (i.e., copying an empty directory) may be considered a
+            // failure. Therefore, we use `Ok(1)`.
+            return Ok(1);
         }
         // An existing but empty mruby directory is a clear sign of a failed or
         // incomplete build.
@@ -59,30 +80,7 @@ pub(crate) fn copy_to_mruby_dir(src_dir: &Path, work_dir: &Path) -> io::Result<u
     }
     println!("cargo:warning=src dir: {src_dir:?}, target dir: {target_dir:?}");
 
-    let status = try_to_copy_dir(src_dir, work_dir);
-
-    let src_dir_name = Path::new(src_dir)
-        .file_name()
-        .ok_or_else(|| io::Error::other("Failed to get src_dir.file_name"))?;
-
-    // In UNIX-like systems' `sh`,
-    // running `cp -r /tmp/xx /out/mruby` behaves as follows:
-    //
-    // - 1. If the `mruby` directory does not exist, the contents of `xx` will be
-    //   copied into a newly created directory named `mruby` automatically.
-    //  (/tmp/xx => /out/mruby)
-    //
-    // - 2. If the `mruby` directory exists, the directory xx will be copied into
-    //   /out/mruby/ as a subdirectory.
-    //  (/tmp/xx => /out/mruby/xx)
-    //
-    // The behavior of `fs_extra::dir::copy` is closer to the 2nd case:
-    // it assumes the destination directory already exists.
-    // Therefore, manual renaming is required.
-    //
-    // In other words:
-    // `dir::copy("/tmp/xx", "/out"); rename("/out/xx", "/out/mruby");`
-    fs::rename(work_dir.join(src_dir_name), target_dir) //
-        .inspect_err(|e| println!("Failed to rename to mruby;\n Err: {e}"))?;
-    status
+    // There's no need to check whether `src_dir` is an empty directory here;
+    // instead, let the final caller handle the Err(_) & Ok(0).
+    try_to_copy_dir(src_dir, &target_dir)
 }

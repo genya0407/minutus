@@ -108,9 +108,16 @@ impl MRubyManager {
         }
 
         if let Some(src_dir) = self.copy_mruby_from {
-            mruby_dir::copy_to_mruby_dir(&src_dir, &workdir).unwrap_or_else(|_| {
-        panic!("Failed to copy dir. src: {src_dir:?}, target: {workdir:?}/mruby")
-      });
+            let copied =
+        mruby_dir::copy_to_mruby_dir(&src_dir, &workdir).unwrap_or_else(|_| {
+          panic!("Failed to copy dir. src: {src_dir:?}, target: {workdir:?}/mruby")
+        });
+            if copied == 0 {
+                panic!(
+                    r#"No files were copied into the `mruby` directory.
+          Please make sure that mruby src dir is not an empty directory."#
+                )
+            }
         }
 
         build_mruby(&workdir, &build_config);
@@ -133,22 +140,18 @@ fn build_mruby(workdir: &Path, path: &Path) {
 }
 
 fn link_mruby(workdir: &Path) {
-    let mrb_cfg_bin = workdir
-        // On Windows, you don't need to manually change path separators "/" to "\\",
-        // because Rust std handles them automatically.
-        //
-        // Note: Modern Unix-like are compatible with the POSIX path separator `/`.
-        .join("mruby/bin/mruby-config");
+    // On Windows, you don't need to manually change path separators "/" to "\\",
+    // because Rust std handles them automatically.
+    //
+    // Note: Modern Unix-like are compatible with the POSIX path separator `/`.
+    let mrb_cfg_bin = workdir.join("mruby/bin/mruby-config");
 
-    #[allow(unreachable_patterns)]
-    let mruby_config = match mrb_cfg_bin {
-        #[cfg(windows)]
-        p => Some(p.with_extension("bat")).filter(|x| x.exists()),
-        #[cfg(not(windows))]
-        p if p.exists() => Some(p),
-        _ => None,
+    let mruby_config =
+        if cfg!(windows) { mrb_cfg_bin.with_extension("bat") } else { mrb_cfg_bin };
+
+    if !mruby_config.exists() {
+        panic!(r#"The `mruby-config` executable file does not exist!"#);
     }
-    .expect(r#"The `mruby-config` executable file does not exist!"#);
 
     let ldflags_before_libs = run_command(
         workdir,
