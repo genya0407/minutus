@@ -244,7 +244,7 @@ Modify your project's `Rakefile`.
 #
 # ...
 # The value of `MINUTUS_MRUBY_DIR` is the path to the source code of mruby.
-ENV["minutus_mruby_dir".upcase] = "/tmp/mruby-master"
+ENV["minutus_mruby_dir".upcase] = "/tmp/mruby-src-dir"
 
 file :mruby do
   #sh "git clone --depth=1 https://github.com/mruby/mruby.git"
