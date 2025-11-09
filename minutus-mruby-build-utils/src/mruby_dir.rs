@@ -74,7 +74,7 @@ pub(crate) fn copy_to_mruby_dir(src_dir: &Path, work_dir: &Path) -> io::Result<u
         }
         // An existing but empty mruby directory is a clear sign of a failed or
         // incomplete build.
-        // Perform cleanup at this stage to prevent issues with subsequent `fs::rename`
+        // Perform cleanup at this stage to prevent issues with subsequent `dir::copy`
         // operations.
         fs::remove_dir_all(&target_dir)?
     }
