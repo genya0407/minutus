@@ -76,6 +76,7 @@ pub(crate) fn copy_to_mruby_dir(src_dir: &Path, work_dir: &Path) -> io::Result<u
         // incomplete build.
         // Perform cleanup at this stage to prevent issues with subsequent `dir::copy`
         // operations.
+        println!("cargo:warning=Removing the existing directory: {target_dir:?}");
         fs::remove_dir_all(&target_dir)?
     }
     println!("cargo:warning=src dir: {src_dir:?}, target dir: {target_dir:?}");
