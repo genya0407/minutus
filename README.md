@@ -194,6 +194,10 @@ Following versions are supported:
 
 You can also use mruby's `master` branch, but it is not tested.
 
+If you need to use mruby versions not listed above (e.g., a specific tag or a fork),
+you can do so via `mruby_dir` feature.
+See "mruby_dir" section for details.
+
 If the version is not specified on Cargo.toml,
 the latest supported stable version is used.
 
@@ -208,6 +212,72 @@ minutus = { version = "*", features = ["mruby_3_2_0"] }
 # Use master branch
 minutus = { version = "*", features = ["mruby_master"] }
 ```
+
+### mruby_dir
+
+When `mruby_dir` feature is specified, minutus uses your local directory as `mruby`.
+
+```toml
+# Cargo.toml
+#
+[dependencies]
+minutus = { version = "*", features = ["mruby_dir"] }
+```
+
+#### Example
+
+```shell
+# POSIX-sh
+#
+cd /tmp
+tag="240412a29080f775fabf97e56fc158b7249367e1"
+curl -Lfo mruby.tgz "https://github.com/mruby/mruby/archive/${tag}.tar.gz"
+
+tar -xf mruby.tgz
+mv mruby-$tag mruby-src-dir
+```
+
+**build:**
+
+Modify your project's `Rakefile`.
+
+```ruby
+# Rakefile
+#
+# ...
+# The value of `MINUTUS_MRUBY_DIR` is the path to the source code of mruby.
+ENV["minutus_mruby_dir".upcase] = "/tmp/mruby-src-dir"
+
+file :mruby do
+  #sh "git clone --depth=1 https://github.com/mruby/mruby.git"
+  #
+  unless Dir.exist?("mruby")
+    FileUtils.cp_r(ENV["minutus_mruby_dir".upcase], "mruby")
+  end
+  # ...
+```
+
+Modify **mrbgem.rake**:
+
+```ruby
+# mrbgem.rake
+#
+MRuby::Gem::Specification.new('mruby-[your-project]') do |spec|
+# ...
+# If you encounter errors during the build process,
+# you can try adding the `-vv` flag to Cargo for more detailed output.
+sh "cd #{__dir__} && cargo build -vv --release"
+# ...
+```
+
+Finally, run `rake compile` to build your project.
+
+## Supported Platforms
+
+**minutus** primarily supports Unix-like systems.
+
+If you encounter issues in a Windows MSVC environment,
+try using **msys2** and the `*-pc-windows-gnu` target.
 
 ## Naming
 

@@ -1,7 +1,6 @@
-use anyhow::{anyhow, Result};
-use std::env;
-use std::path::Path;
+use std::{env, fs, path::Path};
 
+use anyhow::{bail, Result};
 use minutus_mruby_build_utils::MRubyManager;
 
 fn check_command(cmd: &[&str]) {
@@ -24,22 +23,22 @@ fn extract_mruby_source_code() -> Result<()> {
         .join(format!("{}.tar.gz", mruby_version()));
     if !archive_path.exists() {
         println!("cargo:warning={} does not exist", archive_path.display());
-        return Err(anyhow!("{} does not exist", archive_path.display()));
+        bail!("{archive_path:?} does not exist")
     }
 
     if workdir.join("mruby").exists() {
         return Ok(());
     }
 
-    let tar_gz = std::fs::read(archive_path)?;
+    let tar_gz = fs::read(archive_path)?;
     let tar = {
         use bytes::Buf;
         flate2::read::GzDecoder::new(tar_gz.reader())
     };
     let mut archive = tar::Archive::new(tar);
-    archive.unpack(&workdir).unwrap();
+    archive.unpack(workdir).unwrap();
 
-    std::fs::rename(
+    fs::rename(
         workdir.join(format!("mruby-{}", mruby_version())),
         workdir.join("mruby"),
     )?;
@@ -74,38 +73,54 @@ fn main() -> Result<()> {
 
     let out_dir = env::var("OUT_DIR")?;
     let build_config_copy = Path::new(&out_dir).join("build_config.rb");
-    std::fs::copy(
-        &env::current_dir()?.join("build_config.rb"),
+    fs::copy(
+        env::current_dir()?.join("build_config.rb"),
         &build_config_copy,
     )?;
 
-    let do_link = env::var("CARGO_FEATURE_LINK_MRUBY").is_ok();
-    MRubyManager::new()
-        .mruby_version(&mruby_version())
-        .link(do_link)
-        .build_config(&build_config_copy)
-        .run();
+    init_mruby_manager(&build_config_copy)?.run();
     compile_bridge()?;
-
     println!("Finish build.rs");
 
     Ok(())
 }
 
+fn init_mruby_manager(build_config_copy: &Path) -> Result<MRubyManager> {
+    let do_link = env::var("CARGO_FEATURE_LINK_MRUBY").is_ok();
+
+    let mut manager = MRubyManager::new()
+        // We cannot provide proper `mruby_version` if mruby_dir feature is used.
+        .link(do_link)
+        .build_config(build_config_copy);
+
+    manager = if env::var("CARGO_FEATURE_MRUBY_DIR").is_ok() {
+        let mruby_dir = env::var("MINUTUS_MRUBY_DIR")?;
+        manager
+            .download(false)
+            .copy_mruby_from(mruby_dir)
+    } else {
+        manager.mruby_version(&mruby_version())
+    };
+
+    Ok(manager)
+}
+
 fn mruby_version() -> String {
     let default = "3.3.0";
     let supported_versions = &["3.1.0", "3.2.0", "3.3.0", "MASTER"];
-    for version in supported_versions.into_iter() {
+    for version in supported_versions {
         if env::var(format!(
             "CARGO_FEATURE_MRUBY_{}",
             str::replace(version, ".", "_")
         ))
         .is_ok()
         {
-            return version.to_lowercase().to_string();
+            return version
+                .to_lowercase()
+                .to_string();
         }
     }
-    return default.to_string();
+    default.to_string()
 }
 
 fn compile_bridge() -> Result<()> {
@@ -113,7 +128,7 @@ fn compile_bridge() -> Result<()> {
     let out_dir = Path::new(&out_dir);
     // generate bridge.c
     let output = std::process::Command::new("ruby")
-        .args(&["all.rb"])
+        .args(["all.rb"])
         .current_dir(Path::new("src").join("bridge"))
         .output();
     let output = match output {
@@ -125,22 +140,29 @@ fn compile_bridge() -> Result<()> {
     };
     if !output.status.success() {
         eprintln!("{}", String::from_utf8(output.stderr)?);
-        return Err(anyhow!("Failed to execute command"));
+        bail!("Failed to execute command")
     }
 
-    let existing_bridge = std::fs::read(out_dir.join("bridge.c"));
+    let existing_bridge = fs::read(out_dir.join("bridge.c"));
     let bridge_changed = existing_bridge
         .map(|existing_bridge| existing_bridge != output.stdout)
         .unwrap_or(true);
     if bridge_changed {
-        std::fs::write(out_dir.join("bridge.c"), output.stdout)?;
+        fs::write(out_dir.join("bridge.c"), output.stdout)?;
     }
 
     // generate binding
     println!("Start generating binding");
 
-    let mruby_include_path = Path::new(out_dir).join("mruby").join("include");
-    println!("include path: {}", mruby_include_path.to_str().unwrap());
+    let mruby_include_path = Path::new(out_dir)
+        .join("mruby")
+        .join("include");
+    println!(
+        "include path: {}",
+        mruby_include_path
+            .to_str()
+            .unwrap()
+    );
 
     let out_path = Path::new(out_dir).join("mruby.rs");
     let allowlist_types = &[
@@ -162,8 +184,17 @@ fn compile_bridge() -> Result<()> {
     ];
     let allowlist_functions = &["minu_.*", "mrb_raise", "mrb_get_args"];
     let bindings = bindgen::Builder::default()
-        .clang_arg(format!("-I{}", mruby_include_path.to_str().unwrap()))
-        .header(out_dir.join("bridge.c").to_string_lossy())
+        .clang_arg(format!(
+            "-I{}",
+            mruby_include_path
+                .to_str()
+                .unwrap()
+        ))
+        .header(
+            out_dir
+                .join("bridge.c")
+                .to_string_lossy(),
+        )
         .allowlist_type(allowlist_types.join("|"))
         .allowlist_function(allowlist_functions.join("|"))
         .layout_tests(false)

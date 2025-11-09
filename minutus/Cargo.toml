@@ -16,7 +16,7 @@ anyhow = "1.*"
 bindgen = "0.72.1"
 cc = "1.*"
 bytes = "1.*"
-tar = "0.4.40"
+tar = "0.4.44"
 flate2 = "1.*"
 
 [dependencies]
@@ -29,3 +29,4 @@ mruby_3_2_0 = []
 mruby_3_3_0 = []
 mruby_master = []
 link_mruby = []
+mruby_dir = []

@@ -1,26 +1,38 @@
-use anyhow::{anyhow, Result};
 use std::path::{Path, PathBuf};
 
+use anyhow::{bail, Result};
+
+mod mruby_dir;
+
 /// Helper for building and linking libmruby.
+#[derive(Debug)]
 pub struct MRubyManager {
     workdir: Option<PathBuf>,
     mruby_version: Option<String>,
     do_link: bool,
     build_config: Option<PathBuf>,
     do_download: bool,
+    copy_mruby_from: Option<PathBuf>,
 }
 
-impl MRubyManager {
-    /// Construct a new instance of a blank set of configuration.
-    /// This builder is finished with the [run][`MRubyManager::run()`] function.
-    pub fn new() -> Self {
+impl Default for MRubyManager {
+    fn default() -> Self {
         Self {
             workdir: None,
             mruby_version: None,
             do_link: true,
             build_config: None,
             do_download: true,
+            copy_mruby_from: None,
         }
+    }
+}
+
+impl MRubyManager {
+    /// Construct a new instance of a blank set of configuration.
+    /// This builder is finished with the [run][`MRubyManager::run()`] function.
+    pub fn new() -> Self {
+        Self::default()
     }
 
     /// Set workdir. The default is `"OUT_DIR"` environment variable.
@@ -35,15 +47,30 @@ impl MRubyManager {
         self
     }
 
-    /// Set custom `build_config.rb`. If not set, the builder uses mruby's default config.
+    /// Set custom `build_config.rb`. If not set, the builder uses mruby's default
+    /// config.
     pub fn build_config(mut self, build_config: &Path) -> Self {
         self.build_config = Some(build_config.to_path_buf());
         self
     }
 
-    /// Whether the builder should build/link `libmruby.a` or not. The default is `true`.
+    /// Set custom `mruby_dir`
     ///
-    /// If set to `false`, builder does not build nor link libmruby. So you have to do it by yourself.
+    /// # Example
+    ///
+    /// ```ignore
+    /// MRubyManager::new().copy_mruby_from("/path/to/mruby-src-dir").run()
+    /// ```
+    pub fn copy_mruby_from<P: Into<PathBuf>>(mut self, path: P) -> Self {
+        self.copy_mruby_from = Some(path.into());
+        self
+    }
+
+    /// Whether the builder should build/link `libmruby.a` or not. The default is
+    /// `true`.
+    ///
+    /// If set to `false`, builder does not build nor link libmruby. So you have
+    /// to do it by yourself.
     ///
     /// If you embed mruby into your Rust project, this should be `true`.
     pub fn link(mut self, doit: bool) -> Self {
@@ -51,7 +78,8 @@ impl MRubyManager {
         self
     }
 
-    /// Whether the builder should internally download mruby source code or not. The default is `true`.
+    /// Whether the builder should internally download mruby source code or not.
+    /// The default is `true`.
     ///
     /// If set to `false` you have to place `$OUT_DIR/mruby` by yourself.
     pub fn download(mut self, doit: bool) -> Self {
@@ -62,21 +90,36 @@ impl MRubyManager {
     /// Run the task.
     pub fn run(self) {
         let workdir = self.workdir.unwrap_or_else(|| {
-            let out_dir = std::env::var("OUT_DIR")
-                .expect("Could not fetch \"OUT_DIR\" environment variable.");
-            Path::new(&out_dir).to_path_buf()
+            std::env::var("OUT_DIR")
+                .expect(r#"Could not fetch "OUT_DIR" environment variable."#)
+                .into()
         });
-        let mruby_version = self
-            .mruby_version
-            .map(String::from)
-            .expect("mruby_version is not set.");
+
         let build_config = self
             .build_config
-            .unwrap_or(Path::new("default").to_path_buf()); // see: https://github.com/mruby/mruby/blob/3.2.0/doc/guides/compile.md#build
+            .unwrap_or_else(|| "default".into()); // see: https://github.com/mruby/mruby/blob/3.2.0/doc/guides/compile.md#build
 
         if self.do_download {
+            let mruby_version = self
+                .mruby_version
+                .expect("mruby_version is not set.");
+
             download_mruby(&workdir, &mruby_version);
         }
+
+        if let Some(src_dir) = self.copy_mruby_from {
+            let copied =
+        mruby_dir::copy_to_mruby_dir(&src_dir, &workdir).unwrap_or_else(|_| {
+          panic!("Failed to copy dir. src: {src_dir:?}, target: {workdir:?}/mruby")
+        });
+            if copied == 0 {
+                panic!(
+                    r#"No files were copied into the `mruby` directory.
+          Please make sure that mruby src dir is not an empty directory."#
+                )
+            }
+        }
+
         build_mruby(&workdir, &build_config);
 
         if self.do_link {
@@ -86,8 +129,10 @@ impl MRubyManager {
 }
 
 fn build_mruby(workdir: &Path, path: &Path) {
+    let rake = if cfg!(windows) { "rake.bat" } else { "rake" };
+
     let c = &[
-        "rake",
+        rake,
         "all",
         &format!("MRUBY_CONFIG={}", path.to_string_lossy()),
     ];
@@ -95,14 +140,29 @@ fn build_mruby(workdir: &Path, path: &Path) {
 }
 
 fn link_mruby(workdir: &Path) {
-    let mruby_config = workdir.join("mruby").join("bin").join("mruby-config");
+    // On Windows, you don't need to manually change path separators "/" to "\\",
+    // because Rust std handles them automatically.
+    //
+    // Note: Modern Unix-like are compatible with the POSIX path separator `/`.
+    let mrb_cfg_bin = workdir.join("mruby/bin/mruby-config");
+
+    let mruby_config =
+        if cfg!(windows) { mrb_cfg_bin.with_extension("bat") } else { mrb_cfg_bin };
+
+    if !mruby_config.exists() {
+        panic!(r#"The `mruby-config` executable file does not exist!"#);
+    }
+
     let ldflags_before_libs = run_command(
         workdir,
         &[mruby_config.to_str().unwrap(), "--ldflags-before-libs"],
     )
     .unwrap();
-    let ldflags = run_command(workdir, &[mruby_config.to_str().unwrap(), "--ldflags"]).unwrap();
-    let libs = run_command(workdir, &[mruby_config.to_str().unwrap(), "--libs"]).unwrap();
+    let ldflags =
+        run_command(workdir, &[mruby_config.to_str().unwrap(), "--ldflags"])
+            .unwrap();
+    let libs =
+        run_command(workdir, &[mruby_config.to_str().unwrap(), "--libs"]).unwrap();
     println!(
         "cargo:rustc-flags={} {} {}",
         ldflags_before_libs.trim(),
@@ -117,13 +177,15 @@ pub fn download_mruby(workdir: &Path, mruby_version: &str) {
         return;
     }
 
-    let url = if mruby_version == "master" {
-        String::from("https://github.com/mruby/mruby/archive/refs/heads/master.tar.gz")
-    } else {
-        format!(
-            "https://github.com/mruby/mruby/archive/refs/tags/{}.tar.gz",
-            mruby_version
-        )
+    let url = match mruby_version {
+        "master" => {
+            "https://github.com/mruby/mruby/archive/refs/heads/master.tar.gz".into()
+        }
+        _ => {
+            format!(
+        "https://github.com/mruby/mruby/archive/refs/tags/{mruby_version}.tar.gz"
+      )
+        }
     };
 
     let resp = reqwest::blocking::get(url).unwrap();
@@ -133,31 +195,29 @@ pub fn download_mruby(workdir: &Path, mruby_version: &str) {
         flate2::read::GzDecoder::new(tar_gz.reader())
     };
     let mut archive = tar::Archive::new(tar);
-    archive.unpack(&workdir).unwrap();
+    archive.unpack(workdir).unwrap();
 
     std::fs::rename(
-        workdir.join(format!("mruby-{}", mruby_version)),
+        workdir.join(format!("mruby-{mruby_version}")),
         workdir.join("mruby"),
     )
     .unwrap();
 }
 
 fn run_command(current_dir: &Path, cmd: &[&str]) -> Result<String> {
-    println!("Start: {:?}", cmd);
+    println!("Start: {cmd:?}");
 
     let output = std::process::Command::new(cmd[0])
         .args(&cmd[1..])
         .current_dir(current_dir)
         .output()?;
 
-    if output.status.success() {
-        Ok(String::from_utf8_lossy(&output.stdout).to_string())
-    } else {
-        Err(anyhow!(format!(
-            "Executing {:?} failed: {}, {}",
-            cmd,
-            String::from_utf8_lossy(&output.stdout),
-            String::from_utf8_lossy(&output.stderr)
-        )))
+    let [stdout, stderr] = [&output.stdout, &output.stderr] //
+        .map(|buf| String::from_utf8_lossy(buf));
+
+    if !output.status.success() {
+        bail!("Executing {cmd:?} failed!\n stdout: {stdout}\n stderr: {stderr}")
     }
+
+    Ok(stdout.into_owned())
 }
