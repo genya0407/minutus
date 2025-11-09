@@ -108,16 +108,9 @@ impl MRubyManager {
         }
 
         if let Some(src_dir) = self.copy_mruby_from {
-            let copied =
-        mruby_dir::copy_to_mruby_dir(&src_dir, &workdir).unwrap_or_else(|_| {
-          panic!("Failed to copy dir. src: {src_dir:?}, target: {workdir:?}/mruby")
-        });
-            if copied == 0 {
-                panic!(
-                    r#"No files were copied into the `mruby` directory.
-          Please make sure that mruby src dir is not an empty directory."#
-                )
-            }
+            mruby_dir::copy_to_mruby_dir(&src_dir, &workdir).unwrap_or_else(|e| {
+                panic!("Failed to copy dir. src: {src_dir:?}, target: {workdir:?}/mruby\n Error: {e}")
+            })
         }
 
         build_mruby(&workdir, &build_config);
