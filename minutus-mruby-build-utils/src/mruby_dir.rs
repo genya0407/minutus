@@ -27,8 +27,8 @@ fn try_to_copy_dir(from: &Path, to: &Path) -> io::Result<u64> {
     copy_dir(from, to, &opts).map_err(|e| {
         let err_msg = format!(
             "Failed to copy directory.
-      src dir: {from:?}, target dir: {to:?}
-      Err: {e}"
+            src dir: {from:?}, target dir: {to:?}
+            Err: {e}"
         );
         io::Error::other(err_msg)
     })
