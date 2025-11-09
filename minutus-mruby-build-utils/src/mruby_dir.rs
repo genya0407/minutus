@@ -65,7 +65,7 @@ pub(crate) fn copy_to_mruby_dir(src_dir: &Path, work_dir: &Path) -> io::Result<u
 
     if target_dir.exists() {
         if dir_is_not_empty(&target_dir) {
-            println!("cargo:warning=Dir exists: {target_dir:?}");
+            eprintln!("[INFO] Dir exists: {target_dir:?}");
             // Do not use Ok(0) here.
             // Later, we might need to use Ok(n) to determine the number of bytes copied.
             // In some cases, OK(0) (i.e., copying an empty directory) may be considered a
@@ -79,7 +79,7 @@ pub(crate) fn copy_to_mruby_dir(src_dir: &Path, work_dir: &Path) -> io::Result<u
         println!("cargo:warning=Removing the existing directory: {target_dir:?}");
         fs::remove_dir_all(&target_dir)?
     }
-    println!("cargo:warning=src dir: {src_dir:?}, target dir: {target_dir:?}");
+    eprintln!("[INFO] src dir: {src_dir:?}, target dir: {target_dir:?}");
 
     // There's no need to check whether `src_dir` is an empty directory here;
     // instead, let the final caller handle the Err(_) & Ok(0).
