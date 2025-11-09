@@ -194,7 +194,9 @@ Following versions are supported:
 
 You can also use mruby's `master` branch, but it is not tested.
 
-If you need to use mruby versions not listed above (e.g., a specific tag or a fork), you can do so via `mruby_dir` feature. See "mruby_dir" section for details.
+If you need to use mruby versions not listed above (e.g., a specific tag or a fork),
+you can do so via `mruby_dir` feature.
+See "mruby_dir" section for details.
 
 If the version is not specified on Cargo.toml,
 the latest supported stable version is used.
@@ -274,7 +276,8 @@ Finally, run `rake compile` to build your project.
 
 **minutus** primarily supports Unix-like systems.
 
-If you encounter issues in a Windows MSVC environment, try using **msys2** and the `*-pc-windows-gnu` target.
+If you encounter issues in a Windows MSVC environment,
+try using **msys2** and the `*-pc-windows-gnu` target.
 
 ## Naming
 
